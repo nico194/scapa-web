@@ -1,8 +1,8 @@
-import { useState } from 'react'
-import axios from 'axios'
+import { useState } from 'react';
+import axios from 'axios';
+import './Login.scss';
 
-function App() {
-
+function Login() {
 	const [ email, setEmail ] = useState('');
 	const [ password, setPassword] = useState('');
 
@@ -15,7 +15,7 @@ function App() {
 	}
 
 	return (
-		<div className="backgroundImageLogin vh-100 w-100 d-flex justify-content-center align-items-center">
+		<div className="p-login backgroundImageLogin vh-100 w-100 d-flex justify-content-center align-items-center">
 			<div className="card shadow mw-">
 				<div className="card-body">
 					<h3 className="card-title text-center">Iniciar sesión</h3>
@@ -36,4 +36,4 @@ function App() {
 	);
 }
 
-export default App;
+export default Login;
