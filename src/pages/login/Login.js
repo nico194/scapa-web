@@ -11,21 +11,17 @@ function Login({ history }) {
 		e.preventDefault();
 		setLoading(true)
 		console.log(`user : ${email}, ${password} `)
-		setTimeout(() => {
-			setLoading(false)
-			console.log('reslog')
-			history.push('/categories');
+		// setTimeout(() => {
+		// 	setLoading(false)
+		// 	console.log('reslog')
+		// 	history.push('/categories');
 
-		}, 2000)
-		// axios.post('https://scapa-backend-develop.herokuapp.com/admin/auth/sign_in', { email, password })
-		// 	.then(response => {
-		// 		setTimeout(() => {
-		// 			setLoading(false)
-		// 			console.log('res', response)
-
-		// 		}, 2000)
-		// 	})
-		// 	.then(error => console.log('res', error))
+		// }, 2000)
+		axios.post('https://scapa-backend-develop.herokuapp.com/admin/auth/sign_in', { email, password })
+			.then(response => {
+				console.log('res', response)
+			})
+			.catch(error => console.log('res', error))
 	}
 
 	return (
