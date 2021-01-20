@@ -9,7 +9,7 @@ import axios from 'axios';
 export const signIn = (user) => {
     return dispatch => {
         dispatch({ type: FETCH_USERS_PENDING});
-        axios.post(`${process.env.REACT_APP_API_URL}/admin/auth/sign_in`, user)
+        axios.post(`aaaa${process.env.REACT_APP_API_URL}/admin/auth/sign_in`, user)
             .then( response => {
                 console.log(response, response.headers['access-token'])
                 const user = {
