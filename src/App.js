@@ -2,7 +2,7 @@ import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
 import Categories from './pages/categories/Categories';
 import Pictograms from './pages/pictograms/Pictograms';
 import Routines from './pages/routines/Routines';
-import Login from './pages/login/Login'
+import Login from './pages/login/Login';
 
 
 function App() {
