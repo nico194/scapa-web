@@ -12,7 +12,7 @@ export default function Categories() {
     
     useEffect(() => {
         dispatch(getCategories(user))
-    })    
+    }, [])    
 
     const [modal, setModal] = useState(false)   
 
