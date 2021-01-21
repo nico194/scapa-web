@@ -4,14 +4,13 @@ import {
     USER_SIGNIN_SUCCESS,
     USER_LOGOUT,
 } from '../constants/users';
-import axios from 'axios';
+import axiosConfig from '../../configs/axios';
 
 export const signIn = (user) => {
     return dispatch => {
         dispatch({ type: FETCH_USERS_PENDING});
-        axios.post(`aaaa${process.env.REACT_APP_API_URL}/admin/auth/sign_in`, user)
+        axiosConfig.post('/admin/auth/sign_in', user)
             .then( response => {
-                console.log(response, response.headers['access-token'])
                 const user = {
                     id: response.data.data.id,
                     email: response.data.data.email,
@@ -23,7 +22,7 @@ export const signIn = (user) => {
                 }
                 const userEncripted = btoa(JSON.stringify(user))
                 localStorage.setItem('user', userEncripted)
-                return dispatch({ type: USER_SIGNIN_SUCCESS, payload: {user: response}})
+                return dispatch({ type: USER_SIGNIN_SUCCESS, payload: {user}})
             })
             .catch( error => dispatch({ type: FETCH_USERS_ERROR, payload: {error}}))
 

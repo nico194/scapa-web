@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { navigation } from '../../../config';
+import navigation from '../../../configs/navigation';
 
 export default function Header() {
 

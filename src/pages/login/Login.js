@@ -5,6 +5,7 @@ import { signIn } from '../../redux/actions/users'
 import Card from '../../components/molecules/card/Card'
 import Input from '../../components/atoms/input/Input'
 import './Login.scss';
+import Spinner from '../../components/atoms/spinner/Spinner';
 
 function Login({ history }) {
 
@@ -33,11 +34,7 @@ function Login({ history }) {
 					<button type='submit' className='btn btn-primary w-100'>
 						{
 							loading ? 
-								<>
-									<div className='spinner-border text-light' role='status'>
-										<span className='visually-hidden'>Loading...</span>
-									</div>
-								</>
+								<Spinner type='light' />
 								:
 								<span>Ingresar</span>
 						}
