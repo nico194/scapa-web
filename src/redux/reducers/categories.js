@@ -1,10 +1,15 @@
-import { FETCH_CATEGORIES_PENDING,
-         FETCH_CATEGORIES_ERROR,
-         FETCH_CATEGORIES_SUCCESS,
-         FETCH_ADD_CATEGORY_SUCCESS,
-         FETCH_UPDATE_CATEGORY_SUCCESS,
-         FETCH_DELETE_CATEGORY_SUCCESS,
-       } from '../constants/categories';
+import { 
+    FETCH_CATEGORIES_PENDING,
+    FETCH_CATEGORIES_ERROR,
+    FETCH_CATEGORIES_SUCCESS,
+    ADD_CATEGORY_SUCCESS,
+    ADD_CATEGORY_ERROR,
+    UPDATE_CATEGORY_SUCCESS,
+    UPDATE_CATEGORY_ERROR,
+    DELETE_CATEGORY_SUCCESS,
+    DELETE_CATEGORY_ERROR,
+    
+    } from '../constants/categories';
 
 const initialState = {
     loading: false,
@@ -33,27 +38,46 @@ function categoriesReducer(state = initialState, {type, payload}) {
                 loading: false,
                 categories: payload.categories
             }
-        case FETCH_ADD_CATEGORY_SUCCESS: {
+        case ADD_CATEGORY_SUCCESS: {
             return {
                 ...state,
                 loading: false,
                 categories: state.categories.concat(payload.category)
-            }
+            } 
         }
-        case FETCH_UPDATE_CATEGORY_SUCCESS: {
-            const index = state.categories.findIndex(category => category.id === payload.id);
-            state.categories[index].description = payload.newDescription;
+        case ADD_CATEGORY_ERROR: {
             return {
                 ...state,
                 loading: false,
-                categories: state.categories.filter(category => category !== null)
+                err: payload.err
+            }
+        }
+        case UPDATE_CATEGORY_SUCCESS: {
+            return {
+                ...state,
+                loading: false,
+                categories: state.categories.map( cat => cat.id === payload.category.id ? { ...cat, attributes:  { description : payload.category.attributes.description } } : cat )
             };
         }
-        case FETCH_DELETE_CATEGORY_SUCCESS: {
+        case UPDATE_CATEGORY_ERROR: {
+            return {
+                ...state,
+                loading: false,
+                err: payload.err
+            }
+        }
+        case DELETE_CATEGORY_SUCCESS: {
             return {
                 ...state,
                 loading: false,
                 categories: state.categories.filter(category => category.id !== payload.category.id)
+            }
+        }
+        case DELETE_CATEGORY_ERROR: {
+            return {
+                ...state,
+                loading: false,
+                err: payload.err
             }
         }
         default:

@@ -9,34 +9,37 @@ import Table from '../../components/molecules/table/Table'
 
 export default function Categories() {
 
+    const [ modal, setModal ] = useState(false); 
+    const [ category, setCategory ] = useState({ description: '' });
+    const [ isUpdate, setIsUpdate ] = useState(false);
+
     const dispatch = useDispatch();
     const { user } = useSelector(state => state.users);
     const { categories, loading } = useSelector(state => state.categories)
     
     useEffect(() => {
         dispatch(getCategories(user));
-    }, [])    
+    }, [dispatch, user]);
 
-    const [modal, setModal] = useState(false); 
-    const [category, setCategory] = useState({ description: '' });
-    const [ isUpdate, setIsUpdate ] = useState(false);
+    const categoriesHeadTable = ['id', 'Descriptión', '', '']
 
-    const categoriesHeadTable = ['id', 'Descriptión', '']
-
-    const categoriesRow = categories.map( category => {
+    const categoriesRow = categories.map( categoryItem => {
         return (
-            <tr key={ category.id }>
-                <th scope='row'>{ category.id }</th>
-                <td>{ category.attributes.description}</td>
-                <td style={{display:'flex', justifyContent:'space-around'}}>
-                    <i onClick={() => updateCategoryButton(category)} className='bi bi-pencil-square'></i>
-                    <i onClick={() => deleteCategoryButton(category.id)} className='bi bi-trash-fill ml-2'></i>
+            <tr key={ categoryItem.id }>
+                <th scope='row'>{ categoryItem.id }</th>
+                <td>{ categoryItem.attributes.description}</td>
+                <td>
+                    <i onClick={() => updateCategoryButton(categoryItem)} className='bi bi-pencil-square'></i>
+                </td>
+                <td>
+                    <i onClick={() => deleteCategoryButton(categoryItem.id)} className='bi bi-trash-fill'></i>
                 </td>
             </tr>
         )
     });
 
     const openModal = () => {
+        setCategory({});
         setIsUpdate(false);
         setModal(true)
     }
@@ -53,7 +56,7 @@ export default function Categories() {
     };
 
     const deleteCategoryButton = (id) => {
-        dispatch(deleteCategory(id, user))
+        dispatch(deleteCategory(id, user));
     }
 
     return (
@@ -76,7 +79,7 @@ export default function Categories() {
                                     loading ?
                                         <Spinner type='light' />
                                         :
-                                        <span>Agregar</span>
+                                        <span>{ isUpdate ? 'Actualizar' : 'Agregar'}</span>
                                 }
                             </button>
                         </div>
@@ -85,7 +88,8 @@ export default function Categories() {
             }                
             <div className='container'>
                 <h1 className= 'mb-4'>Categorias</h1>
-                <div className='w-100 d-flex justify-content-end'>
+                <div className='w-100 d-flex flex-row justify-content-end'>
+                    <button onClick={ () => dispatch(getCategories(user)) } className='btn btn-info mb-4 mx-4 text-white'>Ordernar</button>
                     <button onClick={openModal} className='btn btn-primary mb-4'>Agregar Categoria</button>
                 </div>
                 {
