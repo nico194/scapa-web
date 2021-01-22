@@ -25,12 +25,12 @@ function Login({ history }) {
 	}
 
 	return (
-		<div className='p-login vh-100 w-100 container d-flex justify-content-center align-items-center'>
+		<div className='p-login vh-100 w-100 d-flex justify-content-center align-items-center'>
 			<Card>
 				<h3 className='card-title text-center'>Iniciar sesión</h3>
 				<form onSubmit={handleSubmit}>
 					<Input label='Email' type='text' placeholer='Ingrese aqui su email...' onChange={ e => setEmail(e.target.value)} />
-					<Input label='Contraseña' type='password' placeholer='Ingrese aqui su password...' onChange={ e => setPassword(e.target.value)} />
+					<Input label='Contraseña' type='password' placeholer='Ingrese aqui su contraseña...' onChange={ e => setPassword(e.target.value)} />
 					<button type='submit' className='btn btn-primary w-100'>
 						{
 							loading ? 
