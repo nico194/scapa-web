@@ -8,13 +8,16 @@ import {
     UPDATE_CATEGORY_ERROR,
     DELETE_CATEGORY_SUCCESS,
     DELETE_CATEGORY_ERROR,
-    
     } from '../constants/categories';
 
 const initialState = {
     loading: false,
     categories: [],
-    category: {},
+    changed: false,
+    previousPage: 0, 
+    currentPage: 0, 
+    totalPage: 0, 
+    nextPage: 0,
     err: null
 }
 
@@ -25,7 +28,11 @@ function categoriesReducer(state = initialState, {type, payload}) {
                 ...state,
                 loading: true
             }
-        case FETCH_CATEGORIES_ERROR: {
+        case FETCH_CATEGORIES_ERROR:
+        case ADD_CATEGORY_ERROR:
+        case UPDATE_CATEGORY_ERROR:
+        case DELETE_CATEGORY_ERROR:
+        {
             return {
                 ...state,
                 loading: false,
@@ -36,48 +43,34 @@ function categoriesReducer(state = initialState, {type, payload}) {
             return {
                 ...state,
                 loading: false,
-                categories: payload.categories
+                categories: payload.categories,
+                changed: false,
+                previousPage: payload.previousPage, 
+                currentPage: payload.currentPage, 
+                totalPage: payload.totalPage, 
+                nextPage: payload.nextPage,
             }
         case ADD_CATEGORY_SUCCESS: {
             return {
                 ...state,
                 loading: false,
-                categories: state.categories.concat(payload.category)
+                categories: state.categories.concat(payload.category),
+                changed: true
             } 
-        }
-        case ADD_CATEGORY_ERROR: {
-            return {
-                ...state,
-                loading: false,
-                err: payload.err
-            }
         }
         case UPDATE_CATEGORY_SUCCESS: {
             return {
                 ...state,
                 loading: false,
-                categories: state.categories.map( cat => cat.id === payload.category.id ? { ...cat, attributes:  { description : payload.category.attributes.description } } : cat )
+                categories: state.categories.map( cat => cat.id === payload.category.id ? { ...cat, attributes:  { description : payload.category.attributes.description } } : cat ),
+                changed: true
             };
-        }
-        case UPDATE_CATEGORY_ERROR: {
-            return {
-                ...state,
-                loading: false,
-                err: payload.err
-            }
         }
         case DELETE_CATEGORY_SUCCESS: {
             return {
                 ...state,
                 loading: false,
                 categories: state.categories.filter(category => category.id !== payload.category.id)
-            }
-        }
-        case DELETE_CATEGORY_ERROR: {
-            return {
-                ...state,
-                loading: false,
-                err: payload.err
             }
         }
         default:

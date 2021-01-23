@@ -7,12 +7,11 @@ import {
     UPDATE_CATEGORY_SUCCESS,
     UPDATE_CATEGORY_ERROR,
     DELETE_CATEGORY_SUCCESS,
-    DELETE_CATEGORY_ERROR,
-    
+    DELETE_CATEGORY_ERROR
     } from '../constants/categories';
 import axiosConfig from '../../configs/axios'
 
-export const getCategories = ({ accessToken, client, uid }) => {
+export const getCategories = ({ accessToken, client, uid }, page = 1, perPage = 15) => {
     return dispatch => {
         dispatch({ type: FETCH_CATEGORIES_PENDING });
         const headers = { headers: {
@@ -20,8 +19,19 @@ export const getCategories = ({ accessToken, client, uid }) => {
             client,
             uid
         }}
-        axiosConfig.get('/admin/categories?per_page=100', headers )
-            .then( response => dispatch({ type: FETCH_CATEGORIES_SUCCESS, payload: { categories: response.data.data }}))
+        axiosConfig.get(`/admin/categories?per_page=${perPage}&page=${page}`, headers )
+            .then( response => 
+                dispatch({ 
+                    type: FETCH_CATEGORIES_SUCCESS, 
+                    payload: { 
+                        categories: response.data.data,
+                        previousPage: response.data.meta.prev_page,
+                        currentPage: response.data.meta.current_page ,
+                        totalPage: response.data.meta.total_pages ,
+                        nextPage: response.data.meta.next_page
+                    }
+                })
+            )
             .catch( err => dispatch({ type: FETCH_CATEGORIES_ERROR, payload: {err}}));
     }
 }

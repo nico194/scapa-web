@@ -5,7 +5,8 @@ import Input from '../../components/atoms/input/Input';
 import Spinner from '../../components/atoms/spinner/Spinner';
 import Modal from '../../components/molecules/modal/Modal';
 import Header from '../../components/organims/header/Header';
-import Table from '../../components/molecules/table/Table'
+import Paginator from '../../components/molecules/paginator/Paginator';
+import Table from '../../components/molecules/table/Table';
 
 export default function Categories() {
 
@@ -15,11 +16,21 @@ export default function Categories() {
 
     const dispatch = useDispatch();
     const { user } = useSelector(state => state.users);
-    const { categories, loading } = useSelector(state => state.categories)
+    const { categories,
+            changed, 
+            previousPage,
+            currentPage,
+            totalPage,
+            nextPage,
+            loading } = useSelector(state => state.categories)
     
     useEffect(() => {
         dispatch(getCategories(user));
     }, [dispatch, user]);
+
+    useEffect(() => {
+        changed && dispatch(getCategories(user));
+    }, [changed]);
 
     const categoriesHeadTable = ['id', 'Descriptión', '', '']
 
@@ -59,22 +70,34 @@ export default function Categories() {
         dispatch(deleteCategory(id, user));
     }
 
+    const goToPreviousPage = () => {
+        dispatch(getCategories(user, currentPage - 1));
+    }
+
+    const goToSpecificPage = (index) => {
+        dispatch(getCategories(user, index));
+    }
+
+    const goToNextPage = () => {
+        dispatch(getCategories(user, currentPage + 1));
+    }
+
     return (
         <div>
             <Header />
             {
                 modal && (
                     <Modal>
-                        <h3>Ingrese el nombre de la categoria:</h3>
+                        <h3>Ingrese el nombre de la categoría:</h3>
                         <Input 
-                            label='Categoria' 
+                            label='Categoría' 
                             type='text' 
-                            placeholer='Ingrese aqui su categoria...' 
+                            placeholer='Ingrese aqui su categoría...' 
                             value={category.attributes !== undefined ? category.attributes.description : ''}
                             onChange={ e => setCategory({ ...category, attributes: { description : e.target.value} })} />
                         <div style={{display:'flex', flexDirection:'row', justifyContent:'space-around'}}>
-                            <button onClick={ () => setModal(false) } className='btn btn-primary mb-4'>Cancelar</button>
-                            <button onClick={createCategory} className='btn btn-primary mb-4'>
+                            <button onClick={ () => setModal(false) } className='btn btn-danger'>Cancelar</button>
+                            <button onClick={createCategory} className='btn btn-primary'>
                                 { 
                                     loading ?
                                         <Spinner type='light' />
@@ -89,8 +112,7 @@ export default function Categories() {
             <div className='container'>
                 <h1 className= 'mb-4'>Categorias</h1>
                 <div className='w-100 d-flex flex-row justify-content-end'>
-                    <button onClick={ () => dispatch(getCategories(user)) } className='btn btn-info mb-4 mx-4 text-white'>Ordernar</button>
-                    <button onClick={openModal} className='btn btn-primary mb-4'>Agregar Categoria</button>
+                    <button onClick={openModal} className='btn btn-primary mb-4'>Agregar Categoría</button>
                 </div>
                 {
                     loading ?
@@ -101,7 +123,15 @@ export default function Categories() {
                         :
                         <Table thead={categoriesHeadTable} tbody={categoriesRow} />
                 }
-                
+                <Paginator 
+                    previousPage={previousPage}
+                    currentPage={currentPage}
+                    totalPage={totalPage}
+                    nextPage={nextPage}
+                    goToPreviousPage={goToPreviousPage}
+                    goToNextPage={goToNextPage}
+                    goToSpecificPage={goToSpecificPage}
+                />
             </div>
         </div>
     )

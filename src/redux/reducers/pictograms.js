@@ -1,19 +1,25 @@
-import { FETCH_PICTOGRAMS_PENDING,
-         FETCH_PICTOGRAMS_ERROR,
-         FETCH_PICTOGRAMS_SUCCESS, 
-         FETCH_ADD_PICTOGRAM_SUCCESS,
-         FETCH_UPDATE_PICTOGRAM_SUCCESS,
-         FETCH_DELETE_PICTOGRAM_SUCCESS,
-         SELECT_PICTOGRAM_TO_PHRASE,
-         UNSELECT_PICTOGRAM_TO_PHRASE
-  } from '../constants/pictograms';
+import { 
+    FETCH_PICTOGRAMS_PENDING,
+    FETCH_PICTOGRAMS_ERROR,
+    FETCH_PICTOGRAMS_SUCCESS,
+    ADD_PICTOGRAM_SUCCESS,
+    ADD_PICTOGRAM_ERROR,
+    UPDATE_PICTOGRAM_SUCCESS,
+    UPDATE_PICTOGRAM_ERROR,
+    DELETE_PICTOGRAM_SUCCESS,
+    DELETE_PICTOGRAM_ERROR,
+    SELECT_PICTOGRAM_TO_PHRASE,
+    UNSELECT_PICTOGRAM_TO_PHRASE
+    } from '../constants/pictograms';
 
 const initialState = {
-    add : false,
-    edit: false,
     loading: false,
     pictograms: [],
-    pictogramsSelected: [],
+    changed: false,
+    previousPage: 0, 
+    currentPage: 0, 
+    totalPage: 0, 
+    nextPage: 0,
     err: null
 }
 
@@ -24,7 +30,11 @@ function pictogramsReducer(state = initialState, {type, payload}) {
                 ...state,
                 loading: true
             }
-        case FETCH_PICTOGRAMS_ERROR: {
+        case FETCH_PICTOGRAMS_ERROR:
+        case ADD_PICTOGRAM_ERROR:
+        case UPDATE_PICTOGRAM_ERROR:
+        case DELETE_PICTOGRAM_ERROR:
+        {    
             return {
                 ...state,
                 loading: false,
@@ -35,28 +45,42 @@ function pictogramsReducer(state = initialState, {type, payload}) {
             return {
                 ...state,
                 loading: false,
-                pictograms: payload.pictograms
+                pictograms: payload.pictograms,
+                changed: false,
+                previousPage: payload.previousPage, 
+                currentPage: payload.currentPage, 
+                totalPage: payload.totalPage, 
+                nextPage: payload.nextPage,
             }
         }
-        case FETCH_ADD_PICTOGRAM_SUCCESS: {
+        case ADD_PICTOGRAM_SUCCESS: {
             return {
                 ...state,
-                pictograms: state.pictograms.concat(payload.pictogram)
+                pictograms: state.pictograms.concat(payload.pictogram),
+                changed: true
             }
         }
-        case FETCH_UPDATE_PICTOGRAM_SUCCESS: {
-            const index = state.pictograms.findIndex(pictogram => pictogram.id === payload.id);
-            state.pictograms[index].description = payload.newDescription;
+        case UPDATE_PICTOGRAM_SUCCESS: {
             return {
                 ...state,
-                pictograms: state.pictograms.filter(pictogram => pictogram !== null)
+                pictograms: state.pictograms.map( 
+                    pic => pic.id === payload.pictogram.id ? 
+                        { 
+                            ...pic, 
+                            attributes:  { description : payload.pictogram.attributes.description },
+                            relationships: { category: { data: { id: payload.pictogram.relationships.category.data.id } }}  
+                        } 
+                        : 
+                        pic 
+                ),
+                changed: true
             };
         }
-        case FETCH_DELETE_PICTOGRAM_SUCCESS: {
+        case DELETE_PICTOGRAM_SUCCESS: {
             return {
                 ...state,
                 loading: false,
-                pictograms: state.pictograms.filter(pictogram => pictogram.id !== payload.id)
+                pictograms: state.pictograms.filter(pictogram => pictogram.id !== payload.pictogram.id)
             }
         }
         case SELECT_PICTOGRAM_TO_PHRASE: {
