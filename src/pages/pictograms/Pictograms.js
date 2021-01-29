@@ -48,7 +48,7 @@ export default function Pictograms() {
             <tr key={ pictogramItem.id }>
                 <th scope='row' style={{ verticalAlign: 'middle' }}>{ pictogramItem.id }</th>
                 <td style={{ width: 150, height: 150, textAlign: 'center', verticalAlign: 'middle' }}>
-                    <img alt='image' src={pictogramImage}  style={{ maxHeight: '100%', maxWidth: '100%', padding: 5}}/>
+                    <img alt={ pictogramItem.attributes.description } src={pictogramImage}  style={{ maxHeight: '100%', maxWidth: '100%', padding: 5}}/>
                 </td>
                 <td style={{ verticalAlign: 'middle' }}>{ pictogramItem.attributes.description }</td>
                 <td style={{ verticalAlign: 'middle' }}>{ category[0].attributes.description }</td>
@@ -112,7 +112,7 @@ export default function Pictograms() {
     }
 
     return (
-        <div>
+        <>
             <Header />
             {
                 modal && (
@@ -168,6 +168,6 @@ export default function Pictograms() {
                     goToSpecificPage={goToSpecificPage}
                 />
             </div>
-        </div>
+        </>
     )
 }

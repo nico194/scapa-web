@@ -1,14 +1,16 @@
 import {
     FETCH_ROUTINES_PENDING,
-    FETCH_ROUTINES_ERROR,
-    SEND_ROUTINE,
-    ACCEPT_ROUTINE
+    FETCH_ROUTINES_SUCCESS,
+    FETCH_ROUTINES_ERROR,    
+    ADD_ROUTINE_SUCCESS,
+    ADD_ROUTINE_EROOR,
 } from '../constants/routines';
 
 const initialState = {
     loading: false,
     err: null,
-    send: false
+    routines: [],
+    changed: false,
 }
 
 const routinesReducer = (state = initialState, { type, payload }) => {
@@ -18,22 +20,25 @@ const routinesReducer = (state = initialState, { type, payload }) => {
                 ...state,
                 loading: true
             }
+        case ADD_ROUTINE_EROOR:
         case FETCH_ROUTINES_ERROR:
             return {
                 ...state,
                 loading: false,
                 error: payload.err
             }
-        case SEND_ROUTINE:
+        case FETCH_ROUTINES_SUCCESS:
             return {
                 ...state,
                 loading: false,
-                send: true
+                changed: false
             }
-        case ACCEPT_ROUTINE: 
+        case ADD_ROUTINE_SUCCESS:
             return {
                 ...state,
-                send: false
+                loading: false,
+                routines: state.routines.concat(payload.routine),
+                changed: true
             }
         default:
             return state;

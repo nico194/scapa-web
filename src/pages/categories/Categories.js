@@ -83,7 +83,7 @@ export default function Categories() {
     }
 
     return (
-        <div>
+        <>
             <Header />
             {
                 modal && (
@@ -96,7 +96,7 @@ export default function Categories() {
                             value={category.attributes !== undefined ? category.attributes.description : ''}
                             onChange={ e => setCategory({ ...category, attributes: { description : e.target.value} })} />
                         <div style={{display:'flex', flexDirection:'row', justifyContent:'space-around'}}>
-                            <button onClick={ () => setModal(false) } className='btn btn-danger'>Cancelar</button>
+                            <button onClick={ () => setModal(false) } Name='btn btn-danger'>Cancelar</button>
                             <button onClick={createCategory} className='btn btn-primary'>
                                 { 
                                     loading ?
@@ -133,6 +133,6 @@ export default function Categories() {
                     goToSpecificPage={goToSpecificPage}
                 />
             </div>
-        </div>
+        </>
     )
 }
