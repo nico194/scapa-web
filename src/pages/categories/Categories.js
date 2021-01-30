@@ -22,7 +22,7 @@ export default function Categories() {
             currentPage,
             totalPage,
             nextPage,
-            loading } = useSelector(state => state.categories)
+            loadingCategories } = useSelector(state => state.categories)
     
     useEffect(() => {
         dispatch(getCategories(user));
@@ -99,7 +99,7 @@ export default function Categories() {
                             <button onClick={ () => setModal(false) } Name='btn btn-danger'>Cancelar</button>
                             <button onClick={createCategory} className='btn btn-primary'>
                                 { 
-                                    loading ?
+                                    loadingCategories ?
                                         <Spinner type='light' />
                                         :
                                         <span>{ isUpdate ? 'Actualizar' : 'Agregar'}</span>
@@ -115,23 +115,30 @@ export default function Categories() {
                     <button onClick={openModal} className='btn btn-primary mb-4'>Agregar Categoría</button>
                 </div>
                 {
-                    loading ?
+                    loadingCategories ?
                         <div className='d-flex flex-row'>
                             <Spinner />
                             <h3 className='px-3'>Cargando...</h3>
                         </div>
                         :
-                        <Table thead={categoriesHeadTable} tbody={categoriesRow} />
+                        categories.length > 0 ?
+                            (
+                                <>
+                                    <Table thead={categoriesHeadTable} tbody={categoriesRow} />
+                                    <Paginator 
+                                        previousPage={previousPage}
+                                        currentPage={currentPage}
+                                        totalPage={totalPage}
+                                        nextPage={nextPage}
+                                        goToPreviousPage={goToPreviousPage}
+                                        goToNextPage={goToNextPage}
+                                        goToSpecificPage={goToSpecificPage}
+                                    />
+                                </>
+                            )
+                            :
+                            <h3>No hay categorias registradas</h3>
                 }
-                <Paginator 
-                    previousPage={previousPage}
-                    currentPage={currentPage}
-                    totalPage={totalPage}
-                    nextPage={nextPage}
-                    goToPreviousPage={goToPreviousPage}
-                    goToNextPage={goToNextPage}
-                    goToSpecificPage={goToSpecificPage}
-                />
             </div>
         </>
     )

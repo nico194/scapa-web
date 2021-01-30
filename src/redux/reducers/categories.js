@@ -11,7 +11,7 @@ import {
     } from '../constants/categories';
 
 const initialState = {
-    loading: false,
+    loadingCategoriesCategories: false,
     categories: [],
     changed: false,
     previousPage: 0, 
@@ -26,7 +26,7 @@ function categoriesReducer(state = initialState, {type, payload}) {
         case FETCH_CATEGORIES_PENDING: 
             return {
                 ...state,
-                loading: true
+                loadingCategories: true
             }
         case FETCH_CATEGORIES_ERROR:
         case ADD_CATEGORY_ERROR:
@@ -35,14 +35,14 @@ function categoriesReducer(state = initialState, {type, payload}) {
         {
             return {
                 ...state,
-                loading: false,
+                loadingCategories: false,
                 err: payload.err
             }
         }
         case FETCH_CATEGORIES_SUCCESS: 
             return {
                 ...state,
-                loading: false,
+                loadingCategories: false,
                 categories: payload.categories,
                 changed: false,
                 previousPage: payload.previousPage, 
@@ -53,7 +53,7 @@ function categoriesReducer(state = initialState, {type, payload}) {
         case ADD_CATEGORY_SUCCESS: {
             return {
                 ...state,
-                loading: false,
+                loadingCategories: false,
                 categories: state.categories.concat(payload.category),
                 changed: true
             } 
@@ -61,7 +61,7 @@ function categoriesReducer(state = initialState, {type, payload}) {
         case UPDATE_CATEGORY_SUCCESS: {
             return {
                 ...state,
-                loading: false,
+                loadingCategories: false,
                 categories: state.categories.map( cat => cat.id === payload.category.id ? { ...cat, attributes:  { description : payload.category.attributes.description } } : cat ),
                 changed: true
             };
@@ -69,7 +69,7 @@ function categoriesReducer(state = initialState, {type, payload}) {
         case DELETE_CATEGORY_SUCCESS: {
             return {
                 ...state,
-                loading: false,
+                loadingCategories: false,
                 categories: state.categories.filter(category => category.id !== payload.category.id)
             }
         }

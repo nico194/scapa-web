@@ -25,7 +25,7 @@ export default function Pictograms() {
         currentPage,
         totalPage,
         nextPage,
-        loading } = useSelector(state => state.pictograms)
+        loadingPictograms } = useSelector(state => state.pictograms)
 
     useEffect(() => {
         dispatch(getCategories(user,1, 999));
@@ -43,23 +43,25 @@ export default function Pictograms() {
     const pictogramsHeadTable = ['id', 'Imagen', 'Descriptión', 'Categoría' ,'', '']
     const pictogramImage = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTgiqiPQ9I_JWbO3G9OlfDjlVdcjbK05VtIMg&usqp=CAU';
     const pictogramsRow = pictograms.map( pictogramItem => {
-        const category = categories.filter( category => category.id === pictogramItem.relationships.category.data.id);
-        return (
-            <tr key={ pictogramItem.id }>
-                <th scope='row' style={{ verticalAlign: 'middle' }}>{ pictogramItem.id }</th>
-                <td style={{ width: 150, height: 150, textAlign: 'center', verticalAlign: 'middle' }}>
-                    <img alt={ pictogramItem.attributes.description } src={pictogramImage}  style={{ maxHeight: '100%', maxWidth: '100%', padding: 5}}/>
-                </td>
-                <td style={{ verticalAlign: 'middle' }}>{ pictogramItem.attributes.description }</td>
-                <td style={{ verticalAlign: 'middle' }}>{ category[0].attributes.description }</td>
-                <td style={{ verticalAlign: 'middle' }}>
-                    <i onClick={() => updatePictogramButton(pictogramItem)} className='bi bi-pencil-square'></i>
-                </td>
-                <td style={{ verticalAlign: 'middle' }}>
-                    <i onClick={() => deletePictogramButton(pictogramItem.id)} className='bi bi-trash-fill'></i>
-                </td>
-            </tr>
-        )
+        const category = categories.filter( category => category.id === pictogramItem.relationships.classifiable.data.id);
+        if (category.length > 0) {
+            return (
+                <tr key={ pictogramItem.id }>
+                    <th scope='row' style={{ verticalAlign: 'middle' }}>{ pictogramItem.id }</th>
+                    <td style={{ width: 150, height: 150, textAlign: 'center', verticalAlign: 'middle' }}>
+                        <img alt={ pictogramItem.attributes.description } src={pictogramImage}  style={{ maxHeight: '100%', maxWidth: '100%', padding: 5}}/>
+                    </td>
+                    <td style={{ verticalAlign: 'middle' }}>{ pictogramItem.attributes.description }</td>
+                    <td style={{ verticalAlign: 'middle' }}>{ category[0].attributes.description }</td>
+                    <td style={{ verticalAlign: 'middle' }}>
+                        <i onClick={() => updatePictogramButton(pictogramItem)} className='bi bi-pencil-square'></i>
+                    </td>
+                    <td style={{ verticalAlign: 'middle' }}>
+                        <i onClick={() => deletePictogramButton(pictogramItem.id)} className='bi bi-trash-fill'></i>
+                    </td>
+                </tr>
+            )
+        }
     });
 
     const categoryOptions = categories.map( category => {
@@ -67,7 +69,7 @@ export default function Pictograms() {
             <option 
                 key={ category.id } 
                 value={ category.id } 
-                selected={ pictogram.relationships !== undefined && category.id === pictogram.relationships.category.data.id }
+                selected={ pictogram.relationships !== undefined && category.id === pictogram.relationships.classifiable.data.id }
                 >
                 {category.attributes.description}
             </option>
@@ -75,7 +77,7 @@ export default function Pictograms() {
     })
 
     const selectCategory = category => {
-        setPictogram({ ...pictogram, relationships: { category: { data: { id : category } } } })
+        setPictogram({ ...pictogram, relationships: { classifiable: { data: { id : category } } } })
     }
 
     const openModal = () => {
@@ -127,14 +129,14 @@ export default function Pictograms() {
                         <Select
                             label='Categoría'
                             options={categoryOptions}
-                            selected={pictogram.relationships !== undefined ? pictogram.relationships.category.data.id : 0}
+                            selected={pictogram.relationships !== undefined ? pictogram.relationships.classifiable.data.id : 0}
                             onChange={ e => selectCategory(e.target.value)}
                             />
                         <div style={{display:'flex', flexDirection:'row', justifyContent:'space-around'}}>
                             <button onClick={ () => setModal(false) } className='btn btn-danger mb-4'>Cancelar</button>
                             <button onClick={createpictogram} className='btn btn-primary mb-4'>
                                 { 
-                                    loading ?
+                                    loadingPictograms ?
                                         <Spinner type='light' />
                                         :
                                         <span>{ isUpdate ? 'Actualizar' : 'Agregar'}</span>
@@ -150,23 +152,30 @@ export default function Pictograms() {
                     <button onClick={openModal} className='btn btn-primary mb-4'>Agregar Pictograma</button>
                 </div>
                 {
-                    loading ?
+                    loadingPictograms ?
                         <div className='d-flex flex-row'>
                             <Spinner />
                             <h3 className='px-3'>Cargando...</h3>
                         </div>
                         :
-                        <Table thead={pictogramsHeadTable} tbody={pictogramsRow} />
+                        pictograms.length > 0 ?
+                            (
+                                <>
+                                    <Table thead={pictogramsHeadTable} tbody={pictogramsRow} />
+                                    <Paginator 
+                                        previousPage={previousPage}
+                                        currentPage={currentPage}
+                                        totalPage={totalPage}
+                                        nextPage={nextPage}
+                                        goToPreviousPage={goToPreviousPage}
+                                        goToNextPage={goToNextPage}
+                                        goToSpecificPage={goToSpecificPage}
+                                    />
+                                </>
+                            )
+                            :
+                            <h3>No hay pictogramas registrados</h3>
                 }
-                <Paginator 
-                    previousPage={previousPage}
-                    currentPage={currentPage}
-                    totalPage={totalPage}
-                    nextPage={nextPage}
-                    goToPreviousPage={goToPreviousPage}
-                    goToNextPage={goToNextPage}
-                    goToSpecificPage={goToSpecificPage}
-                />
             </div>
         </>
     )

@@ -8,8 +8,7 @@ import {
     UPDATE_PICTOGRAM_ERROR,
     DELETE_PICTOGRAM_SUCCESS,
     DELETE_PICTOGRAM_ERROR,
-    SELECT_PICTOGRAM_TO_PHRASE,
-    UNSELECT_PICTOGRAM_TO_PHRASE
+    FILTER_PICTOGRAMS_BY_CATEGORY
     } from '../constants/pictograms';
 import axiosConfig from '../../configs/axios'
 
@@ -48,7 +47,7 @@ export const addPictogram = (pictogramToAdd , { accessToken, client, uid }) => {
         const pictogram = {
             pictogram: {
                 description: pictogramToAdd.attributes.description,
-                category_id: pictogramToAdd.relationships.category.data.id
+                classifiable_id: pictogramToAdd.relationships.classifiable.data.id
             }
         }
         axiosConfig.post('/admin/pictograms', JSON.stringify(pictogram), headers )
@@ -84,7 +83,7 @@ export const updatePictogram = (pictogramToUpdate, { accessToken, client, uid })
         const pictogram = {
             pictogram: {
                 description: pictogramToUpdate.attributes.description,
-                category_id: pictogramToUpdate.relationships.category.data.id
+                classifiable_id: pictogramToUpdate.relationships.classifiable.data.id
             }
         }
         axiosConfig.put(`/admin/pictograms/${pictogramToUpdate.id}`, JSON.stringify(pictogram), headers)
@@ -93,14 +92,4 @@ export const updatePictogram = (pictogramToUpdate, { accessToken, client, uid })
     }
 }
 
-export const selectPictogramToPhrase = pictogram => {
-    return dispatch => {
-        dispatch({ type: SELECT_PICTOGRAM_TO_PHRASE, payload: {pictogram} })
-    }
-}
-
-export const unselectPictogramToPhrase = index => {
-    return dispatch => {
-        dispatch({ type: UNSELECT_PICTOGRAM_TO_PHRASE, payload: {index} })
-    }
-}
+export const filterPictogramsByCategory = idCategory => dispatch => dispatch({ type: FILTER_PICTOGRAMS_BY_CATEGORY, payload: {idCategory }})

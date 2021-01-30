@@ -8,13 +8,13 @@ import {
     UPDATE_PICTOGRAM_ERROR,
     DELETE_PICTOGRAM_SUCCESS,
     DELETE_PICTOGRAM_ERROR,
-    SELECT_PICTOGRAM_TO_PHRASE,
-    UNSELECT_PICTOGRAM_TO_PHRASE
+    FILTER_PICTOGRAMS_BY_CATEGORY
     } from '../constants/pictograms';
 
 const initialState = {
-    loading: false,
+    loadingPictograms: false,
     pictograms: [],
+    filteredPictograms: [],
     changed: false,
     previousPage: 0, 
     currentPage: 0, 
@@ -28,7 +28,7 @@ function pictogramsReducer(state = initialState, {type, payload}) {
         case FETCH_PICTOGRAMS_PENDING: 
             return {
                 ...state,
-                loading: true
+                loadingPictograms: true
             }
         case FETCH_PICTOGRAMS_ERROR:
         case ADD_PICTOGRAM_ERROR:
@@ -37,15 +37,16 @@ function pictogramsReducer(state = initialState, {type, payload}) {
         {    
             return {
                 ...state,
-                loading: false,
+                loadingPictograms: false,
                 err: payload.err
             }
         }
         case FETCH_PICTOGRAMS_SUCCESS: {
             return {
                 ...state,
-                loading: false,
+                loadingPictograms: false,
                 pictograms: payload.pictograms,
+                filteredPictograms: payload.pictograms,
                 changed: false,
                 previousPage: payload.previousPage, 
                 currentPage: payload.currentPage, 
@@ -68,7 +69,7 @@ function pictogramsReducer(state = initialState, {type, payload}) {
                         { 
                             ...pic, 
                             attributes:  { description : payload.pictogram.attributes.description },
-                            relationships: { category: { data: { id: payload.pictogram.relationships.category.data.id } }}  
+                            relationships: { classifiable: { data: { id: payload.pictogram.relationships.classifiable.data.id } }}  
                         } 
                         : 
                         pic 
@@ -79,21 +80,14 @@ function pictogramsReducer(state = initialState, {type, payload}) {
         case DELETE_PICTOGRAM_SUCCESS: {
             return {
                 ...state,
-                loading: false,
+                loadingPictograms: false,
                 pictograms: state.pictograms.filter(pictogram => pictogram.id !== payload.pictogram.id)
             }
         }
-        case SELECT_PICTOGRAM_TO_PHRASE: {
+        case FILTER_PICTOGRAMS_BY_CATEGORY: {
             return {
                 ...state,
-                pictogramsSelected: state.pictogramsSelected.concat(payload.pictogram)
-            }
-        }
-        case UNSELECT_PICTOGRAM_TO_PHRASE: {
-            
-            return {
-                ...state,
-                pictogramsSelected: state.pictogramsSelected.filter((pictogram, index) => index !== payload.index)
+                filteredPictograms: state.pictograms.filter( pic => pic.relationships.classifiable.data.id === payload.idCategory)
             }
         }
         default:
