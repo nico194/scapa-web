@@ -87,7 +87,8 @@ function pictogramsReducer(state = initialState, {type, payload}) {
         case FILTER_PICTOGRAMS_BY_CATEGORY: {
             return {
                 ...state,
-                filteredPictograms: state.pictograms.filter( pic => pic.relationships.classifiable.data.id === payload.idCategory)
+                filteredPictograms: payload.pictograms,
+                loadingPictograms: false
             }
         }
         default:

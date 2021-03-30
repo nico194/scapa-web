@@ -30,7 +30,7 @@ export default function NewRoutine() {
     }, [dispatch, user]);
 
     useEffect(() => {
-        dispatch(getPictograms(user));
+        dispatch(filterPictogramsByCategory(1, user));
     }, [dispatch, user]);
 
     useEffect(() => {
@@ -59,26 +59,21 @@ export default function NewRoutine() {
         )
     })
 
-    const getAllPictograms = () => {
-        setCategoryId(0);
-        dispatch(getPictograms(user));
-    }
-
     const searchPictogramsFromCategory = idCategory => {
         setCategoryId(idCategory);
-        dispatch(filterPictogramsByCategory(idCategory));
+        dispatch(filterPictogramsByCategory(idCategory, user));
     }
 
     const pictogramImage = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTgiqiPQ9I_JWbO3G9OlfDjlVdcjbK05VtIMg&usqp=CAU';
-    const pictogramsCard = filteredPictograms.map(pictogram => {
+    const pictogramsCard = filteredPictograms && filteredPictograms.map(pictogram => {
         return (
-            <Pictogram width='200px' onClick={ () => addPictogramToPhrase(pictogram)} key={pictogram.id} img={pictogramImage} description={ pictogram.attributes.description } />
+            <Pictogram width='200px' onClick={ () => addPictogramToPhrase(pictogram)} key={pictogram.id} img={pictogram.attributes.image_url ? `${process.env.REACT_APP_API_URL}${pictogram.attributes.image_url}` : pictogramImage} description={ pictogram.attributes.description } />
         )
     })
 
     const phraseCards = phrase.map( pictogram => {
         return (
-            <Pictogram width='200px' onClick={ () => removePictogramToPhrase(pictogram)} key={pictogram.id} img={pictogramImage} description={ pictogram.attributes.description } />
+            <Pictogram width='200px' onClick={ () => removePictogramToPhrase(pictogram)} key={pictogram.id} img={pictogram.attributes.image_url ? `${process.env.REACT_APP_API_URL}${pictogram.attributes.image_url}` : pictogramImage} description={ pictogram.attributes.description } />
         )
     }) 
 
@@ -92,11 +87,10 @@ export default function NewRoutine() {
 
     const addOrEditRoutine = () => {
         const routine = {
-            id: idRoutine,
             description,
-            phrase
+            pictograms: phrase
         }
-        isUpdate ? dispatch(updateRoutine(routine)) : dispatch(addRoutine(routine));
+        isUpdate ? dispatch(updateRoutine(routine)) : dispatch(addRoutine(routine, user));
     }
 
     return (
@@ -142,9 +136,6 @@ export default function NewRoutine() {
                                     />                
                         } 
                     </div>
-                    <div className="col-4 text-end">
-                        <button onClick={getAllPictograms} className='btn btn-primary mb-3'>Todos los Pictogramas</button>
-                    </div>
                 </div>
                 <div className="row">
                     <div className="col-12 mb-5">
@@ -167,7 +158,7 @@ export default function NewRoutine() {
                                                 <h3>No hay resultados</h3>        
                                         } 
                                     </div>
-                                    </>
+                                </>
                         }
                     </div>
                 </div>

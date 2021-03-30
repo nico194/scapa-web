@@ -49,7 +49,9 @@ export default function Pictograms() {
                 <tr key={ pictogramItem.id }>
                     <th scope='row' style={{ verticalAlign: 'middle' }}>{ pictogramItem.id }</th>
                     <td style={{ width: 150, height: 150, textAlign: 'center', verticalAlign: 'middle' }}>
-                        <img alt={ pictogramItem.attributes.description } src={pictogramImage}  style={{ maxHeight: '100%', maxWidth: '100%', padding: 5}}/>
+                        <img alt={ pictogramItem.attributes.description } 
+                             src={pictogramItem.attributes.image_url ? `${process.env.REACT_APP_API_URL}${pictogramItem.attributes.image_url}` : pictogramImage}  
+                             style={{ maxHeight: '100%', maxWidth: '100%', padding: 5}}/>
                     </td>
                     <td style={{ verticalAlign: 'middle' }}>{ pictogramItem.attributes.description }</td>
                     <td style={{ verticalAlign: 'middle' }}>{ category[0].attributes.description }</td>

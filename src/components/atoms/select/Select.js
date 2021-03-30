@@ -11,7 +11,6 @@ export default function Select({ label, options, onChange }) {
                 aria-label='Default select'
                 onChange={onChange}
                 >
-                <option value={0} >Selccione una opción</option>
                 { options }
             </select>
         </div>

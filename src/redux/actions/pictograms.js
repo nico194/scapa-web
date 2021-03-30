@@ -92,4 +92,26 @@ export const updatePictogram = (pictogramToUpdate, { accessToken, client, uid })
     }
 }
 
-export const filterPictogramsByCategory = idCategory => dispatch => dispatch({ type: FILTER_PICTOGRAMS_BY_CATEGORY, payload: {idCategory }})
+export const filterPictogramsByCategory = (idCategory, { accessToken, client, uid }) => {
+    return dispatch => {
+        dispatch({ type: FETCH_PICTOGRAMS_PENDING });
+        const headers = { headers: {
+            'access-token': accessToken,
+            client,
+            uid
+        }}
+        axiosConfig.get(`/admin/pictograms?category_id=${idCategory}&per_page=100`, headers )
+            .then( response =>  {
+                
+                dispatch({ 
+                    type: FILTER_PICTOGRAMS_BY_CATEGORY, 
+                    payload: { 
+                        pictograms: response.data.data
+                    }
+                })
+            }
+            )
+            .catch( err => dispatch({ type: FETCH_PICTOGRAMS_ERROR, payload: {err}}));
+    }
+}
+

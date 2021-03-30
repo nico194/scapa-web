@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
-import { getRoutine, deleteRoutine } from '../../redux/actions/routines';
+import { getRoutines, deleteRoutine } from '../../redux/actions/routines';
 import Pictogram from '../../components/organims/pictogram/Pictogram';
 import Header from '../../components/organims/header/Header';
 
@@ -10,10 +10,11 @@ export default function Routines() {
     const history = useHistory();
 
     const dispatch = useDispatch();
+    const { user } = useSelector(state => state.users)
     const { routines } = useSelector(state => state.routines)
 
     useEffect(() => {
-        dispatch(getRoutine())
+        dispatch(getRoutines(user))
     }, [dispatch]);
 
     const updateRoutine = routine => {
@@ -37,9 +38,9 @@ export default function Routines() {
                         </div>                   
                         <div className="d-flex flex-row align-items-center ">
                             {
-                                routine.phrase.map( pictogram => {
+                                routine.pictograms.map( pictogram => {
                                     return (
-                                        <Pictogram width='15%' key={pictogram.id} img={pictogramImage} description={ pictogram.attributes.description } />
+                                        <Pictogram width='15%' key={pictogram.id} img={pictogram.attributes.image_url ? `${process.env.REACT_APP_API_URL}${pictogram.attributes.image_url}` : pictogramImage} description={ pictogram.attributes.description } />
                                     );
                                 })
                             }
@@ -49,7 +50,7 @@ export default function Routines() {
                 <div className='col-2'>
                     <div className='d-flex flex-row justify-content-around align-items-center'>
                         <i 
-                            className='bi bi-pencil-square'
+                            className='bi bi-pencil-square d-none'
                             style={{ fontSize: '1.5rem'}}
                             onClick={() => updateRoutine(routine)} 
                             >
@@ -57,7 +58,7 @@ export default function Routines() {
                         <i 
                             className='bi bi-trash-fill'
                             style={{ fontSize: '1.5rem'}}
-                            onClick={() => dispatch(deleteRoutine(routine))} 
+                            onClick={() => dispatch(deleteRoutine(routine, user))} 
                             >
                         </i>
                     </div>
