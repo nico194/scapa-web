@@ -4,6 +4,7 @@ import { Link, useHistory } from 'react-router-dom';
 import { getRoutines, deleteRoutine } from '../../redux/actions/routines';
 import Pictogram from '../../components/organims/pictogram/Pictogram';
 import Header from '../../components/organims/header/Header';
+import Spinner from '../../components/atoms/spinner/Spinner';
 
 export default function Routines() {
 
@@ -11,11 +12,11 @@ export default function Routines() {
 
     const dispatch = useDispatch();
     const { user } = useSelector(state => state.users)
-    const { routines } = useSelector(state => state.routines)
-
+    const { routines, loadingRoutines } = useSelector(state => state.routines)
+    
     useEffect(() => {
         dispatch(getRoutines(user))
-    }, [dispatch]);
+    }, []);
 
     const updateRoutine = routine => {
         history.push({
@@ -76,10 +77,14 @@ export default function Routines() {
                     <Link to='/new-routine' className='btn btn-primary'>Agregar Rutina</Link>
                 </div>
                 { 
-                    routines.length > 0 ?
-                        routinesList
-                        :
-                        <h3>No hay rutinas cargadas</h3>
+                    loadingRoutines ? 
+                        <Spinner /> :
+                        (
+                            routines.length > 0 ?
+                                routinesList
+                                :
+                                <h3>No hay rutinas cargadas</h3>
+                        )
                 }              
             </div>
         </>

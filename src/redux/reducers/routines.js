@@ -38,6 +38,7 @@ const routinesReducer = (state = initialState, { type, payload }) => {
             return {
                 ...state,
                 loadingRoutines: false,
+                routines: payload.routines,
                 changed: false
             }
         case ADD_ROUTINE_SUCCESS:
@@ -67,6 +68,7 @@ const routinesReducer = (state = initialState, { type, payload }) => {
         case DELETE_ROUTINE_SUCCESS:
             return {
                 ...state,
+                loadingRoutines: false,
                 routines: state.routines.filter( routine => routine.id !== payload.routine.id)
             }
         default:
