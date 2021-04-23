@@ -7,24 +7,41 @@ import Spinner from '../../components/atoms/spinner/Spinner';
 import Select from '../../components/atoms/select/Select';
 import Modal from '../../components/molecules/modal/Modal';
 import Header from '../../components/organims/header/Header';
-import Paginator from '../../components/molecules/paginator/Paginator';
+import FullPaginator from '../../components/molecules/paginator/FullPaginator';
 import Table from '../../components/molecules/table/Table'
+import UploadImage from '../../components/atoms/upload-image/UploadImage';
 
 export default function Pictograms() {
 
+    const initialStatePictogram = {
+        id: -1,
+        image: null,
+        attributes: {
+            description: '',
+            image_url: ''
+        },
+        relationships: {
+            classifiable: {
+                data: {
+                    id: 1
+                }
+            }
+        }
+    }
+
     const [ modal, setModal ] = useState(false); 
-    const [ pictogram, setPictogram ] = useState({});
+    const [ pictogram, setPictogram ] = useState(initialStatePictogram);
     const [ isUpdate, setIsUpdate ] = useState(false);
+    const [ showAlert, setShowAlert ] = useState(false);
+    const [charged, setCharged] = useState(false);
 
     const dispatch = useDispatch();
     const { user } = useSelector(state => state.users);
     const { categories } = useSelector(state => state.categories)
     const { pictograms,
         changed, 
-        previousPage,
         currentPage,
         totalPage,
-        nextPage,
         loadingPictograms } = useSelector(state => state.pictograms)
 
     useEffect(() => {
@@ -39,18 +56,30 @@ export default function Pictograms() {
     useEffect(() => {
         changed && dispatch(getPictograms(user));
     }, [changed]);
+
+    const getImageURL = (place, imageURL) => {
+        switch (place) {
+            case 'table':
+            case 'update':
+                return `${process.env.REACT_APP_API_URL}${imageURL}`;
+            case 'add':
+                return imageURL;
+            default:
+                return '';
+        }
+    }
     
     const pictogramsHeadTable = ['id', 'Imagen', 'Descriptión', 'Categoría' ,'', '']
-    const pictogramImage = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTgiqiPQ9I_JWbO3G9OlfDjlVdcjbK05VtIMg&usqp=CAU';
     const pictogramsRow = pictograms.map( pictogramItem => {
         const category = categories.filter( category => category.id === pictogramItem.relationships.classifiable.data.id);
         if (category.length > 0) {
+            const src = getImageURL('table', pictogramItem.attributes.image_url);
             return (
                 <tr key={ pictogramItem.id }>
                     <th scope='row' style={{ verticalAlign: 'middle' }}>{ pictogramItem.id }</th>
                     <td style={{ width: 150, height: 150, textAlign: 'center', verticalAlign: 'middle' }}>
                         <img alt={ pictogramItem.attributes.description } 
-                             src={pictogramItem.attributes.image_url ? `${process.env.REACT_APP_API_URL}${pictogramItem.attributes.image_url}` : pictogramImage}  
+                             src={src}  
                              style={{ maxHeight: '100%', maxWidth: '100%', padding: 5}}/>
                     </td>
                     <td style={{ verticalAlign: 'middle' }}>{ pictogramItem.attributes.description }</td>
@@ -77,30 +106,63 @@ export default function Pictograms() {
             </option>
         )
     })
+    
+    const openModal = () => {
+        setPictogram(initialStatePictogram);
+        setIsUpdate(false);
+        setShowAlert(false);
+        setModal(true)
+    }
+
+    const setDescription = e => {
+        setPictogram({ ...pictogram, attributes: { ...pictogram.attributes, description: e.target.value }})
+    }
+    
+    const uploadImagen = e => {
+        setCharged(true);
+        setPictogram({ ...pictogram, image: e.target.files[0], attributes : { ...pictogram.attributes, image_url: URL.createObjectURL(e.target.files[0]) }});
+    }
 
     const selectCategory = category => {
         setPictogram({ ...pictogram, relationships: { classifiable: { data: { id : category } } } })
     }
 
-    const openModal = () => {
-        setPictogram({});
-        setIsUpdate(false);
-        setModal(true)
+    const createPictogram = () => {
+        setShowAlert(false);
+        if (isNotValidForm()) {
+            setShowAlert(true);
+        } else {
+            isUpdate ? dispatch(updatePictogram(pictogram, user)) : dispatch(addPictogram(pictogram, user))
+            setModal(false);
+        }
     }
 
-    const createpictogram = () => {
-        isUpdate ? dispatch(updatePictogram(pictogram, user)) : dispatch(addPictogram(pictogram, user))
-        setModal(false);
+    const isNotValidForm = () => {
+        let isNotValid = false;
+        Object.keys(pictogram).forEach(key => {
+            if (key === 'image') {
+                if (pictogram[key] === null) return isNotValid = true
+            } else {
+                if (key === 'attributes') {
+                    if (pictogram[key].description === '' ) return isNotValid = true 
+                }
+            }
+        });
+        return isNotValid;
     }
+
 
     const updatePictogramButton = (pictogramToUpdate) =>{
         setIsUpdate(true);
+        setCharged(false);
         setPictogram(pictogramToUpdate)
         setModal(true);
     };
 
     const deletePictogramButton = (id) => {
-        dispatch(deletePictogram(id, user));
+        if(window.confirm('Desea eliminar este pictograma?')) {
+            dispatch(deletePictogram(id, user));
+        }
     }
 
     const goToPreviousPage = () => {
@@ -120,23 +182,38 @@ export default function Pictograms() {
             <Header />
             {
                 modal && (
-                    <Modal>
+                    <Modal>                        
                         <h3>Ingrese un pictograma:</h3>
+                        {
+                            showAlert &&
+                            <div className="alert alert-danger" role="alert">
+                                Complete todos los campos por favor
+                            </div>
+                        }
                         <Input 
                             label='Descripción' 
                             type='text' 
-                            placeholer='Ingrese aqui su categoria...' 
-                            value={pictogram.attributes !== undefined ? pictogram.attributes.description : ''}
-                            onChange={ e => setPictogram({ ...pictogram, attributes: { description : e.target.value} })} />
+                            placeholer='Ingrese aqui su categoría...' 
+                            value={pictogram.attributes.description}
+                            onChange={ e => setDescription(e) }
+                            />
+                        <UploadImage 
+                            label='Imagen'
+                            type='file'
+                            placeholer='Suba una imagen aquí...'
+                            src={ charged ? pictogram.attributes.image_url : getImageURL('update',pictogram.attributes.image_url) }
+                            alt={pictogram.image ? pictogram.attributes.description : ''}
+                            onChange={ e => uploadImagen(e) }                            
+                        />
                         <Select
                             label='Categoría'
                             options={categoryOptions}
-                            selected={pictogram.relationships !== undefined ? pictogram.relationships.classifiable.data.id : 0}
+                            selected={pictogram.relationships.classifiable.data.id}
                             onChange={ e => selectCategory(e.target.value)}
                             />
                         <div style={{display:'flex', flexDirection:'row', justifyContent:'space-around'}}>
                             <button onClick={ () => setModal(false) } className='btn btn-danger mb-4'>Cancelar</button>
-                            <button onClick={createpictogram} className='btn btn-primary mb-4'>
+                            <button onClick={createPictogram} className='btn btn-primary mb-4'>
                                 { 
                                     loadingPictograms ?
                                         <Spinner type='light' />
@@ -161,22 +238,19 @@ export default function Pictograms() {
                         </div>
                         :
                         pictograms.length > 0 ?
-                            (
-                                <>
-                                    <Table thead={pictogramsHeadTable} tbody={pictogramsRow} />
-                                    <Paginator 
-                                        previousPage={previousPage}
-                                        currentPage={currentPage}
-                                        totalPage={totalPage}
-                                        nextPage={nextPage}
-                                        goToPreviousPage={goToPreviousPage}
-                                        goToNextPage={goToNextPage}
-                                        goToSpecificPage={goToSpecificPage}
-                                    />
-                                </>
-                            )
+                            <Table thead={pictogramsHeadTable} tbody={pictogramsRow} />
                             :
                             <h3>No hay pictogramas registrados</h3>
+                }
+                {
+                    pictograms.length !== 0 &&
+                        <FullPaginator 
+                            currentPage={currentPage}
+                            totalPage={totalPage}
+                            goToPreviousPage={goToPreviousPage}
+                            goToNextPage={goToNextPage}
+                            goToSpecificPage={goToSpecificPage}
+                        />
                 }
             </div>
         </>

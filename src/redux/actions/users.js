@@ -24,14 +24,34 @@ export const signIn = (user) => {
                 localStorage.setItem('user', userEncripted)
                 return dispatch({ type: USER_SIGNIN_SUCCESS, payload: {user}})
             })
-            .catch( error => dispatch({ type: FETCH_USERS_ERROR, payload: {error}}))
+            .catch( error => {
+                console.log('action error: ', error.response)
+                return dispatch({ type: FETCH_USERS_ERROR, payload: {err: error.response}})
+            })
 
     }
 }
 
-export const logOut = () => {
-    return dispatch => {
-        localStorage.setItem('user', JSON.stringify({}))
-        dispatch({ type: USER_LOGOUT, payload: { user: {} } })
+export const logOut = ({ accessToken, client, uid }) => {
+    return async dispatch => {
+        dispatch({ type: FETCH_USERS_PENDING});
+        const headers = { headers: {
+            'access-token': accessToken,
+            client,
+            uid
+        }}
+        console.log( headers )
+        try {
+            const response = await axiosConfig.delete('/admin/auth/sign_out', headers);
+            console.log(response)
+            if(response.data.success) {
+                localStorage.setItem('user', JSON.stringify({}))
+                return dispatch({ type: USER_LOGOUT, payload: { user: {} } })
+            } else {
+                return;
+            }
+        } catch (error) {
+            return dispatch({ type: FETCH_USERS_ERROR, payload: {error}})
+        }
     }
 }

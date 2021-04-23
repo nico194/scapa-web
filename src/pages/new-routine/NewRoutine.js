@@ -17,6 +17,7 @@ export default function NewRoutine() {
     const [ description, setDescription ] = useState('');
     const [ categoryId, setCategoryId ] = useState(0);
     const [ isUpdate, setIsUpdate ] = useState(false);
+    const [showAlert, setShowAlert] = useState(false)
 
     const location = useLocation()
     const dispatch = useDispatch();
@@ -86,11 +87,17 @@ export default function NewRoutine() {
     }
 
     const addOrEditRoutine = () => {
-        const routine = {
-            description,
-            pictograms: phrase
+        if( description === '' || phrase.length === 0 ) {
+            window.scrollTo(0, 0)
+            setShowAlert(true)
+        } else {
+            setShowAlert(false)
+            const routine = {
+                description,
+                pictograms: phrase
+            }
+            isUpdate ? dispatch(updateRoutine(routine)) : dispatch(addRoutine(routine, user));
         }
-        isUpdate ? dispatch(updateRoutine(routine)) : dispatch(addRoutine(routine, user));
     }
 
     return (
@@ -98,6 +105,12 @@ export default function NewRoutine() {
             <Header />
             <div className='container'>
                 <h1 className='mb-5'>Armado de Rutinas:</h1>
+                {
+					showAlert &&
+						<div className="alert alert-danger" role="alert">
+							Complete todos los campos, por favor
+						</div>
+				}
                 <Input 
                     label='Descripción' 
                     type='text' placeholer='Ingrese aqui su descripción...' 

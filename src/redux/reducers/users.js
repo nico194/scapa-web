@@ -32,7 +32,13 @@ const UsersReducer = (state = initialState, { type, payload }) => {
                 err: payload.err
             }
         }
-        case USER_LOGOUT:
+        case USER_LOGOUT: 
+            return {
+                ...state,
+                loading: false,
+                user: payload.user,
+                login: false
+            }
         case USER_SIGNIN_SUCCESS:
         case USER_SIGNUP_SUCCESS: 
             return {
@@ -40,8 +46,7 @@ const UsersReducer = (state = initialState, { type, payload }) => {
                 loading: false,
                 user: payload.user,
                 login: true
-            }
-        
+            }        
         default:
             return state
     }

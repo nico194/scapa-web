@@ -10,7 +10,7 @@ const navigation = [
     {
         goto: '/routines',
         text: 'Rutinas'
-    },
+    }
 ]
 
 export default navigation;

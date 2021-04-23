@@ -10,9 +10,17 @@ import Table from '../../components/molecules/table/Table';
 
 export default function Categories() {
 
+    const initialStateCategory = {
+        id: -1,
+        attributes: {
+            description: ''
+        }
+    }
+
     const [ modal, setModal ] = useState(false); 
-    const [ category, setCategory ] = useState({ description: '' });
+    const [ category, setCategory ] = useState(initialStateCategory);
     const [ isUpdate, setIsUpdate ] = useState(false);
+    const [ showAlert, setShowAlert ] = useState(false);
 
     const dispatch = useDispatch();
     const { user } = useSelector(state => state.users);
@@ -50,14 +58,19 @@ export default function Categories() {
     });
 
     const openModal = () => {
-        setCategory({});
+        setCategory(initialStateCategory);
+        setShowAlert(false);
         setIsUpdate(false);
         setModal(true)
     }
 
     const createCategory = () => {
-        isUpdate ? dispatch(updateCategory(category, user)) : dispatch(addCategory(category, user))
-        setModal(false);
+        if(category.attributes.description !== '') {
+            isUpdate ? dispatch(updateCategory(category, user)) : dispatch(addCategory(category, user))
+            setModal(false);
+        } else {
+            setShowAlert(true);
+        }
     }
 
     const updateCategoryButton = (categoryToUpdate) =>{
@@ -67,7 +80,9 @@ export default function Categories() {
     };
 
     const deleteCategoryButton = (id) => {
-        dispatch(deleteCategory(id, user));
+        if(window.confirm('Desea eliminar esta categoría?')) {
+            dispatch(deleteCategory(id, user));
+        }
     }
 
     const goToPreviousPage = () => {
@@ -89,6 +104,12 @@ export default function Categories() {
                 modal && (
                     <Modal>
                         <h3>Ingrese el nombre de la categoría:</h3>
+                        {
+                            showAlert &&
+                            <div className="alert alert-danger" role="alert">
+                                Complete el campos por favor
+                            </div>
+                        }
                         <Input 
                             label='Categoría' 
                             type='text' 
@@ -96,7 +117,7 @@ export default function Categories() {
                             value={category.attributes !== undefined ? category.attributes.description : ''}
                             onChange={ e => setCategory({ ...category, attributes: { description : e.target.value} })} />
                         <div style={{display:'flex', flexDirection:'row', justifyContent:'space-around'}}>
-                            <button onClick={ () => setModal(false) } Name='btn btn-danger'>Cancelar</button>
+                            <button onClick={ () => setModal(false) } className='btn btn-danger'>Cancelar</button>
                             <button onClick={createCategory} className='btn btn-primary'>
                                 { 
                                     loadingCategories ?

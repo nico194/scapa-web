@@ -36,23 +36,39 @@ export const getPictograms = ({ accessToken, client, uid }, page = 1) => {
     }
 }
 
+const toBase64 = file => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+});
+
 export const addPictogram = (pictogramToAdd , { accessToken, client, uid }) => {
-    return dispatch => {
-        //dispatch({ type: FETCH_PICTOGRAMS_PENDING });
+    return async dispatch => {
+        dispatch({ type: FETCH_PICTOGRAMS_PENDING });
         const headers = { headers: {
             'access-token': accessToken,
             client,
             uid
         }}
+        const imageInBase64 = await toBase64(pictogramToAdd.image)
         const pictogram = {
             pictogram: {
                 description: pictogramToAdd.attributes.description,
-                classifiable_id: pictogramToAdd.relationships.classifiable.data.id
+                classifiable_id: pictogramToAdd.relationships.classifiable.data.id,
+                image: {
+                    data: imageInBase64,
+                    filename: pictogramToAdd.attributes.description
+                }
             }
         }
-        axiosConfig.post('/admin/pictograms', JSON.stringify(pictogram), headers )
-            .then( response => dispatch({ type: ADD_PICTOGRAM_SUCCESS, payload: {pictogram: response.data.data}}))
-            .catch( err => dispatch({ type: ADD_PICTOGRAM_ERROR, payload: {err}}));
+        try {
+            const response = await axiosConfig.post('/admin/pictograms', JSON.stringify(pictogram), headers )
+            return dispatch({ type: ADD_PICTOGRAM_SUCCESS, payload: {pictogram: response.data.data}})
+        } catch (err) {
+            console.log(err)
+            return dispatch({ type: ADD_PICTOGRAM_ERROR, payload: {err}});
+        }
     }
 }
 
@@ -71,7 +87,7 @@ export const deletePictogram = (id, { accessToken, client, uid }) => {
 }
 
 export const updatePictogram = (pictogramToUpdate, { accessToken, client, uid }) => {
-    return dispatch => {
+    return async dispatch => {
         dispatch({ type: FETCH_PICTOGRAMS_PENDING });
         const headers = {
             headers: {
@@ -80,15 +96,25 @@ export const updatePictogram = (pictogramToUpdate, { accessToken, client, uid })
                 uid
             }
         }
+        const imageInBase64 = await toBase64(pictogramToUpdate.image)
         const pictogram = {
             pictogram: {
                 description: pictogramToUpdate.attributes.description,
-                classifiable_id: pictogramToUpdate.relationships.classifiable.data.id
+                classifiable_id: pictogramToUpdate.relationships.classifiable.data.id,
+                image: {
+                    data: imageInBase64,
+                    filename: pictogramToUpdate.attributes.description
+                }
             }
         }
-        axiosConfig.put(`/admin/pictograms/${pictogramToUpdate.id}`, JSON.stringify(pictogram), headers)
-            .then( response => dispatch({ type: UPDATE_PICTOGRAM_SUCCESS, payload: {pictogram: response.data.data}}))
-            .catch( err => dispatch({ type: UPDATE_PICTOGRAM_ERROR, payload: {err}}));
+        try {
+            const response = await axiosConfig.put(`/admin/pictograms/${pictogramToUpdate.id}`, JSON.stringify(pictogram), headers)
+
+            return dispatch({ type: UPDATE_PICTOGRAM_SUCCESS, payload: {pictogram: response.data.data}})
+        } catch (err) {
+            console.log(err)
+            return dispatch({ type: UPDATE_PICTOGRAM_ERROR, payload: {err}});
+        }
     }
 }
 
