@@ -7,8 +7,8 @@ import { addRoutine, updateRoutine } from '../../redux/actions/routines';
 import Input from '../../components/atoms/input/Input'
 import Spinner from '../../components/atoms/spinner/Spinner';
 import Select from '../../components/atoms/select/Select';
-import Pictogram from '../../components/organims/pictogram/Pictogram'
-import Header from '../../components/organims/header/Header';
+import Pictogram from '../../components/organisms/pictogram/Pictogram'
+import Header from '../../components/organisms/header/Header';
 
 export default function NewRoutine() {
 

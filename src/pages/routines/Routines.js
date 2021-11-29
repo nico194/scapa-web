@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
 import { getRoutines, deleteRoutine } from '../../redux/actions/routines';
-import Pictogram from '../../components/organims/pictogram/Pictogram';
-import Header from '../../components/organims/header/Header';
+import Pictogram from '../../components/organisms/pictogram/Pictogram';
+import Header from '../../components/organisms/header/Header';
 import Spinner from '../../components/atoms/spinner/Spinner';
 
 export default function Routines() {
