@@ -1,0 +1,3 @@
+export const PICTOGRAMS_PER_PAGE = 10
+export const CATEGORIES_PER_PAGE = 10
+export const SIBLING_TO_PAGINATION = 2
