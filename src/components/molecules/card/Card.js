@@ -1,17 +1,14 @@
-import React from 'react'
-
-export default function Card({ children, image }) {
+import { Card as CardUI, CardActions, CardContent, CardMedia } from '@mui/material'
+export const Card = ({ image, content, actions, stylesCard, stylesImage, onClick }) => {
 	return (
-		<div className='card shadow mx-3'>
-			{
-				image &&
-				<img src={image} className='card-img-top' alt='alternative' />
-			}{
-				children &&
-				<div className='card-body'>
-					{children}
-				</div>
-			}
-		</div>
+		<CardUI sx={stylesCard} elevation={6} onClick={onClick}>
+      { image && <CardMedia component='img' src={image} sx={stylesImage} /> }
+      <CardContent>
+        {content}
+      </CardContent>
+      <CardActions>
+        {actions}
+      </CardActions>
+		</CardUI>
 	)
 }

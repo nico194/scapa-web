@@ -1,9 +1,5 @@
-import React from 'react'
+import { CircularProgress } from '@mui/material'
 
-export default function Spinner({ type = 'dark' }) {
-	return (
-		<div className={`spinner-border text-${type}`} role='status'>
-			<span className='visually-hidden'>Loading...</span>
-		</div>
-	)
+export const Spinner = ({ type = 'dark' }) => {
+	return <CircularProgress color={type} />
 }

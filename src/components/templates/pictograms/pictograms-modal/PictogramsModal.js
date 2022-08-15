@@ -1,118 +1,132 @@
+import {
+  Alert,
+  AlertTitle,
+  Button,
+  Grid,
+  TextField,
+  Typography,
+} from '@mui/material';
 import React, { useState } from 'react';
-import { useCategories } from '../../../../hooks/useCategories';
-import Alert from '../../../atoms/alert/Alert';
-import Button from '../../../atoms/button/Button';
-import Input from '../../../atoms/input/Input';
-import Select from '../../../atoms/select/Select';
-import Spinner from '../../../atoms/spinner/Spinner'
 import UploadImage from '../../../atoms/upload-image/UploadImage';
-import Modal from '../../../molecules/modal/Modal';
-import CategoriesSelect from '../../../templates/categories/categories-select/CategoriesSelect';
+import { Card } from '../../../molecules/card/Card';
+import { Modal } from '../../../molecules/modal/Modal';
+import { CategoriesSelect } from '../../categories/categories-select/CategoriesSelect';
 
-export default function PictogramsModal({ user, pictogram, isUpdate, loading, setPictogram, setModal, createPictogram }) {
+export const PictogramsModal = ({
+  user,
+  modal,
+  handleModal,
+  pictogram,
+  isUpdate,
+  setPictogram,
+  createPictogram,
+}) => {
+  const [emptyForm, setEmptyForm] = useState(null);
 
-	const [charged, setCharged] = useState(false);
-	const [showAlert, setShowAlert] = useState(false);
+  const selectCategory = (category) => {
+    setPictogram({
+      ...pictogram,
+      relationships: { classifiable: { data: { id: category } } },
+    });
+  };
 
-	console.log('bbbb', pictogram, pictogram.relationships.classifiable.data.id)
+  const uploadImagen = (e) => {
+    setPictogram({
+      ...pictogram,
+      previewImage: URL.createObjectURL(e.target.files[0]),
+      attributes: {
+        ...pictogram.attributes,
+        image_url: e.target.files[0],
+      },
+    });
+  };
 
-	const setDescription = (e) => {
-		setPictogram({
-			...pictogram,
-			attributes: { ...pictogram.attributes, description: e.target.value },
-		});
-	};
+  const handleButton = () => {
+    const imageValidation = isUpdate ? pictogram.attributes.image_url === '' : !pictogram.previewImage 
+    if (pictogram.attributes.description === '' || imageValidation )
+      return setEmptyForm(true);
+    createPictogram();
+  };
 
-	const selectCategory = (category) => {
-		setPictogram({
-			...pictogram,
-			relationships: { classifiable: { data: { id: category } } },
-		});
-	};
+  return (
+    <Modal modal={modal} onClose={handleModal}>
+      <Card
+        stylesCard={{
+          width: 450,
+          padding: 2,
+          borderRadius: 2,
+        }}
+        content={
+          <>
+            <Typography variant='h5' marginBottom={4}>
+              Ingrese un nuevo pictograma:
+            </Typography>
+            {emptyForm && (
+              <Alert
+                severity='error'
+                sx={{ marginBottom: 4 }}
+                onClose={() => setEmptyForm(false)}
+              >
+                <AlertTitle>Error</AlertTitle>
+                  Por favor, complete el formulario.
+                </Alert>
+            )}
+            <TextField
+              fullWidth
+              label='Ingrese aquí su pictograma...'
+              sx={{ marginBottom: 4 }}
+              value={
+                pictogram.attributes.description !== ''
+                  ? pictogram.attributes.description
+                  : ''
+              }
+              onChange={(e) =>
+                setPictogram({
+                  ...pictogram,
+                  attributes: {
+                    ...pictogram.attributes,
+                    description: e.target.value,
+                  },
+                })
+              }
+            />
+            <Grid container justifyContent='space-between' alignItems='baseline' marginBottom={4}>
+              <Grid item>
+                <Typography variant='h6' >Seleccione una categoria:</Typography>
+              </Grid>
+              <Grid item>
+                <CategoriesSelect
+                  user={user}
+                  categorySelected={pictogram.relationships.classifiable.data.id}
+                  selectCategory={(id) => selectCategory(id)} 
+                />
+              </Grid>
+            </Grid>
+            <UploadImage
+              src={
+                pictogram.previewImage
+                  ? pictogram.previewImage
+                  : pictogram.attributes.image_url !== ''
+                  ? `${process.env.REACT_APP_API_URL}${pictogram.attributes.image_url}`
+                  : ''
+              }
+              alt={pictogram.attributes.description}
+              handleImage={(e) => uploadImagen(e)}
+            />
+          </>
+        }
+        actions={
+          <Grid container justifyContent='flex-end'>
+            <Button variant='text' sx={{ marginRight: 2 }} onClick={() => handleModal(false)}>
+              Cancelar
+            </Button>
+            <Button variant='contained' onClick={handleButton}>
+              {isUpdate ? 'Actualizar ' : 'Agregar '}Pictograma
+            </Button>
+          </Grid>
+        }
+      />
+    </Modal>
+  );
+};
 
-	const uploadImagen = (e) => {
-		setCharged(true);
-		setPictogram({
-			...pictogram,
-			image: e.target.files[0],
-			attributes: {
-				...pictogram.attributes,
-				image_url: URL.createObjectURL(e.target.files[0]),
-			},
-		});
-	};
-
-	const isNotValidForm = () => {
-		let isNotValid = false;
-		Object.keys(pictogram).forEach((key) => {
-			if (key === 'image') {
-				if (pictogram[key] === null) return (isNotValid = true);
-			} else {
-				if (key === 'attributes') {
-					if (pictogram[key].description === '') return (isNotValid = true);
-				}
-			}
-		});
-		return isNotValid;
-	};
-
-	const validForm = () => {
-		setShowAlert(false);
-		if (isNotValidForm()) {
-			setShowAlert(true);
-		} else {
-			createPictogram()
-		}
-	}
-
-
-	return (
-		<Modal>
-			<h3>Ingrese el nombre de la categoría:</h3>
-			{
-				showAlert &&
-					<Alert message='Complete el campos por favor' onClick={() => setShowAlert(false)} />
-      }
-			<Input
-				label='Descripción'
-				type='text'
-				placeholer='Ingrese aqui su categoría...'
-				value={pictogram.attributes.description}
-				onChange={e => setDescription(e)}
-			/>
-			<UploadImage
-				label='Imagen'
-				type='file'
-				placeholer='Suba una imagen aquí...'
-				src={`${!charged ? process.env.REACT_APP_API_URL : ''}${pictogram.attributes.image_url}`}
-				alt={pictogram.image ? pictogram.attributes.description : ''}
-				onChange={e => uploadImagen(e)}
-			/>
-			<CategoriesSelect
-					user={user}
-					categorySelected={pictogram.relationships.classifiable.data.id}
-					selectCategory={id => selectCategory(id)}
-				/>
-			<div
-				style={{
-					display: 'flex',
-					flexDirection: 'row',
-					justifyContent: 'space-around',
-				}}
-			>
-				<Button text='Cancelar' type='danger' onClick={() => setModal(false)} />
-				<Button
-					text={
-						loading ? (
-							<Spinner type='light' />
-						) : (
-							<span>{isUpdate ? 'Actualizar' : 'Agregar'}</span>
-						)
-					}
-					type='primary'
-					onClick={validForm}
-				/>
-			</div>
-		</Modal>
-	);
-}

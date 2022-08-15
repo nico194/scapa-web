@@ -1,15 +1,15 @@
+import { Typography } from '@mui/material'
 import React from 'react'
-import Card from '../../molecules/card/Card'
+import { Card } from '../../molecules/card/Card'
 
-export default function Pictogram({ width, img, description, onClick = () => { } }) {
+export const Pictogram = ({ img, description, styles, onClick = () => {} }) => {
 	return (
-		<div onClick={onClick} className='mb-3' style={{ width: width }}>
-			<Card image={img} >
-				{
-					description &&
-						<h6 className='card-text text-center'>{description}</h6>
-				}
-			</Card>
-		</div>
+		<Card
+			image={img}
+			stylesImage={{ width: '100px', margin: '0 auto' }}
+			content={<Typography variant='h6'>{description}</Typography>}
+			onClick={onClick}
+			stylesCard={styles}
+		/>
 	)
 }

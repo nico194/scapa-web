@@ -67,8 +67,15 @@ export const getAllCategories = ({ accessToken, client, uid }) => {
 	}
 }
 
-export const addCategory = (categoryDescription, { accessToken, client, uid }) => {
-	return dispatch => {
+const toBase64 = file => new Promise((resolve, reject) => {
+	const reader = new FileReader();
+	reader.readAsDataURL(file);
+	reader.onload = () => resolve(reader.result);
+	reader.onerror = error => reject(error);
+});
+
+export const addCategory = (categoryToAdd, { accessToken, client, uid }) => {
+	return async dispatch => {
 		dispatch({ type: FETCH_CATEGORIES_PENDING });
 		const headers = {
 			headers: {
@@ -77,16 +84,48 @@ export const addCategory = (categoryDescription, { accessToken, client, uid }) =
 				uid
 			}
 		}
+		const imageInBase64 = await toBase64(categoryToAdd.attributes.image_url)
 		const category = {
 			category: {
-				description: categoryDescription.attributes.description
+				description: categoryToAdd.attributes.description,
+				image: {
+					filename: `${categoryToAdd.attributes.description}.png`,
+					data: imageInBase64
+				}
+		
 			}
 		}
 		axiosConfig.post('/admin/categories', JSON.stringify(category), headers)
 			.then(response => dispatch({ type: ADD_CATEGORY_SUCCESS, payload: { category: response.data.data } }))
 			.catch(err => {
 				dispatch({ type: FETCH_CATEGORIES_ERROR, payload: { err: err.response.data.error }})
-			});
+		});
+	}
+}
+
+export const updateCategory = (categoryToUpdate, { accessToken, client, uid }) => {
+	return async dispatch => {
+		dispatch({ type: FETCH_CATEGORIES_PENDING });
+		const headers = {
+			headers: {
+				'access-token': accessToken,
+				client,
+				uid
+			}
+		}
+		const imageInBase64 = await toBase64(categoryToUpdate.attributes.image_url)
+		const category = {
+			category: {
+				description: categoryToUpdate.attributes.description,
+				image: {
+					filename: `${categoryToUpdate.attributes.description}.png`,
+					data: imageInBase64
+				}
+			}
+		}
+		axiosConfig.put(`/admin/categories/${categoryToUpdate.id}`, JSON.stringify(category), headers)
+			.then(response => dispatch({ type: UPDATE_CATEGORY_SUCCESS, payload: { category: response.data.data } }))
+			.catch(err => dispatch({ type: UPDATE_CATEGORY_ERROR, payload: { err: err.response.data.error } }));
 	}
 }
 
@@ -106,25 +145,5 @@ export const deleteCategory = (id, { accessToken, client, uid }) => {
 	}
 }
 
-export const updateCategory = (categoryToUpdate, { accessToken, client, uid }) => {
-	return dispatch => {
-		dispatch({ type: FETCH_CATEGORIES_PENDING });
-		const headers = {
-			headers: {
-				'access-token': accessToken,
-				client,
-				uid
-			}
-		}
-		const category = {
-			category: {
-				description: categoryToUpdate.attributes.description
-			}
-		}
-		axiosConfig.put(`/admin/categories/${categoryToUpdate.id}`, JSON.stringify(category), headers)
-			.then(response => dispatch({ type: UPDATE_CATEGORY_SUCCESS, payload: { category: response.data.data } }))
-			.catch(err => dispatch({ type: UPDATE_CATEGORY_ERROR, payload: { err: err.response.data.error } }));
-	}
-}
 
 export const clearError = () => dispatch => dispatch({ type: CLEAR_ERROR })

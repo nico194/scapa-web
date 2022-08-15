@@ -1,54 +1,109 @@
-import React from 'react';
-import Button from '../../../atoms/button/Button';
-import Input from '../../../atoms/input/Input';
-import Spinner from '../../../atoms/spinner/Spinner'
-import Modal from '../../../molecules/modal/Modal';
+import {
+  Alert,
+  AlertTitle,
+  Button,
+  Grid,
+  TextField,
+  Typography,
+} from '@mui/material';
+import React, { useState } from 'react';
+import UploadImage from '../../../atoms/upload-image/UploadImage';
+import { Card } from '../../../molecules/card/Card';
+import { Modal } from '../../../molecules/modal/Modal';
 
-export default function CategoriesModal({ category, isUpdate, loading, setCategory, setModal, createCategory }) {
+export const CategoriesModal = ({
+  modal,
+  handleModal,
+  category,
+  isUpdate,
+  setCategory,
+  createCategory,
+}) => {
+  const [emptyForm, setEmptyForm] = useState(null);
+
+  const uploadImagen = (e) => {
+    setCategory({
+      ...category,
+      previewImage: URL.createObjectURL(e.target.files[0]),
+      attributes: {
+        ...category.attributes,
+        image_url: e.target.files[0],
+      },
+    });
+  };
+
+  const handleButton = () => {
+    if (category.attributes.description === '' || !category.previewImage)
+      return setEmptyForm(true);
+    createCategory();
+  };
+
   return (
-    <Modal>
-      <h3>Ingrese el nombre de la categoría:</h3>
-      {/* {showAlert && (
-        <div className='alert alert-danger' role='alert'>
-          Complete el campos por favor
-        </div>
-      )} */}
-      <Input
-        label='Categoría'
-        type='text'
-        placeholer='Ingrese aquí su categoría...'
-        value={
-          category.attributes !== undefined
-            ? category.attributes.description
-            : ''
+    <Modal modal={modal} onClose={handleModal}>
+      <Card
+        stylesCard={{
+          width: 450,
+          padding: 2,
+          borderRadius: 2,
+        }}
+        content={
+          <>
+            <Typography variant='h5' marginBottom={4}>
+              Ingrese una nueva categoria:
+            </Typography>
+            {emptyForm && (
+              <Alert
+                severity='error'
+                sx={{ marginBottom: 4 }}
+                onClose={() => setEmptyForm(false)}
+              >
+                <AlertTitle>Error</AlertTitle>
+                Por favor, complete el formulario.
+              </Alert>
+            )}
+            <TextField
+              fullWidth
+              label='Ingrese aquí su categoría...'
+              sx={{ marginBottom: 4 }}
+              value={
+                category.attributes.description !== ''
+                  ? category.attributes.description
+                  : ''
+              }
+              onChange={(e) =>
+                setCategory({
+                  ...category,
+                  attributes: {
+                    ...category.attributes,
+                    description: e.target.value,
+                  },
+                })
+              }
+            />
+            <UploadImage
+              src={
+                category.previewImage
+                  ? category.previewImage
+                  : category.attributes.image_url !== ''
+                  ? `${process.env.REACT_APP_API_URL}${category.attributes.image_url}`
+                  : ''
+              }
+              alt={category.attributes.description}
+              handleImage={(e) => uploadImagen(e)}
+            />
+          </>
         }
-        onChange={(e) =>
-          setCategory({
-            ...category,
-            attributes: { description: e.target.value },
-          })
+        actions={
+          <Grid container justifyContent='flex-end'>
+            <Button sx={{ marginRight: 2 }} onClick={() => handleModal(false)}>
+              Cancelar
+            </Button>
+            <Button variant='contained' onClick={handleButton}>
+              {isUpdate ? 'Actualizar ' : 'Agregar '}Categoria
+            </Button>
+          </Grid>
         }
       />
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'space-around',
-        }}
-      >
-        <Button text='Cancelar' type='danger' onClick={() => setModal(false)} />
-        <Button
-          text={
-            loading ? (
-              <Spinner type='light' />
-            ) : (
-              <span>{isUpdate ? 'Actualizar' : 'Agregar'}</span>
-            )
-          }
-          type='primary'
-          onClick={createCategory}
-        />
-      </div>
     </Modal>
   );
-}
+};

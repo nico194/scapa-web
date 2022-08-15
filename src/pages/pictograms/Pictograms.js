@@ -6,30 +6,29 @@ import {
   updatePictogram,
   clearError,
 } from '../../redux/actions/pictograms';
-import Button from '../../components/atoms/button/Button';
-import Alert from '../../components/atoms/alert/Alert';
-import Header from '../../components/organisms/header/Header';
-import PictogramsSearch from '../../components/templates/pictograms/pictograms-search/PictogramsSearch';
-import PictogramsTable from '../../components/templates/pictograms/pictograms-table/PictogramsTable';
-import PictogramsPagination from '../../components/templates/pictograms/pictograms-pagination/PictogramsPagination';
-import PictogramsModal from '../../components/templates/pictograms/pictograms-modal/PictogramsModal';
+import { PictogramsSearch } from '../../components/templates/pictograms/pictograms-search/PictogramsSearch';
+import { PictogramsTable } from '../../components/templates/pictograms/pictograms-table/PictogramsTable';
+import { PictogramsPagination } from '../../components/templates/pictograms/pictograms-pagination/PictogramsPagination';
+import { PictogramsModal } from '../../components/templates/pictograms/pictograms-modal/PictogramsModal';
+import {
+  Container,
+  Grid,
+  IconButton,
+  Typography,
+  Alert,
+  Button,
+} from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 
-
-export default function Pictograms() {
-  
+export const Pictograms = () => {
   const dispatch = useDispatch();
-	const { user } = useSelector((state) => state.users);
-	const {
-		pictograms,
-		loadingPictograms,
-    currentPage, 
-    totalPage, 
-    err
-	} = useSelector((state) => state.pictograms);
+  const { user } = useSelector((state) => state.users);
+  const { pictograms, loadingPictograms, totalPage, changed, err } =
+    useSelector((state) => state.pictograms);
 
   const initialStatePictogram = {
     id: -1,
-    image: null,
+    previewImage: null,
     attributes: {
       description: '',
       image_url: '',
@@ -43,83 +42,102 @@ export default function Pictograms() {
     },
   };
 
-  const [modal, setModal] = useState(false);
+  const [modal, handleModal] = useState(false);
   const [pictogram, setPictogram] = useState(initialStatePictogram);
   const [isUpdate, setIsUpdate] = useState(false);
+  const [fistTime, setFirstTime] = useState(true);
 
-	useEffect(() => {
-		dispatch(getPictograms(user, 1, 10))
-    // if(fistTime) {
-    //   dispatch(getCategories(user))
-    //   setFirstTime(false);
-    // } else {
-    //   changed &&  dispatch(getPictograms(user))
-    // }
-  }, [user, dispatch]);
+  useEffect(() => {
+    dispatch(getPictograms(user, 1, 15));
+    if (fistTime) {
+      dispatch(getPictograms(user));
+      setFirstTime(false);
+    } else {
+      changed && dispatch(getPictograms(user));
+    }
+  }, [user, dispatch, changed]);
 
   const openModal = () => {
     setPictogram(initialStatePictogram);
     setIsUpdate(false);
-    setModal(true);
+    handleModal(true);
   };
 
   const createPictogram = () => {
     isUpdate
-        ? dispatch(updatePictogram(pictogram, user))
-        : dispatch(addPictogram(pictogram, user));
-      setModal(false);
+      ? dispatch(updatePictogram(pictogram, user))
+      : dispatch(addPictogram(pictogram, user));
+    handleModal(false);
   };
 
   return (
-    <>
-      <Header />
-      <div className='container'>
-        <h1 className='mb-4'>Pictogramas</h1>
-        <div className='row'>
-          <div className='col-12 col-md-6'>
-            <PictogramsSearch user={user}/>
-          </div>
-          <div className='col-12 col-md-6'>
-            <Button
-              text='Agregar Pictograma'
-              type='primary'
-              position='center'
-              extraClassName='justify-content-md-end'
-              onClick={openModal}
-            />
-          </div>
-        </div>
-        <div className='row'>
-          <div className='col-12'>
-          { err && <Alert message={err} onClick={() => dispatch(clearError())} /> }
-          </div>
-        </div>
-				<PictogramsTable 
-          pictograms={pictograms} 
+    <Container maxWidth='xl'>
+      <Typography variant='h4' marginBottom={8}>
+        Pictogramas
+      </Typography>
+      {err && (
+        <Grid container marginBottom={4}>
+          <Alert
+            severity='error'
+            sx={{
+              width: '100%',
+              borderRadius: 2,
+              padding: 1,
+              paddingX: 4,
+              fontSize: 18,
+              alignItems: 'center',
+            }}
+            action={
+              <IconButton
+                color='inherit'
+                size='large'
+                onClick={() => dispatch(clearError())}
+              >
+                <CloseIcon fontSize='inherit' />
+              </IconButton>
+            }
+          >
+            {err}
+          </Alert>
+        </Grid>
+      )}
+      <Grid container justifyContent='space-between' marginBottom={6}>
+        <Grid item>
+          <PictogramsSearch user={user} />
+        </Grid>
+        <Grid item>
+          <Button onClick={openModal} variant='contained'>
+            Agregar Pictograma
+          </Button>
+        </Grid>
+      </Grid>
+      <Grid container marginBottom={4}>
+        <PictogramsTable
+          pictograms={pictograms}
           user={user}
           loading={loadingPictograms}
           setPictogram={setPictogram}
-          setModal={setModal}
+          handleModal={handleModal}
           setIsUpdate={setIsUpdate}
         />
+      </Grid>
+      <Grid container justifyContent='center'>
         <PictogramsPagination
           user={user}
-          currentPage={currentPage} 
-          totalPage={totalPage} 
+          totalPage={totalPage}
+          dispatchFunction={(page) => dispatch(getPictograms(user, page, 10))}
         />
-      </div>
-      {
-        modal &&
-          <PictogramsModal
-            user={user}
-            pictogram={pictogram}
-            isUpdate={isUpdate}
-            setPictogram={setPictogram}
-            setModal={setModal}
-            createPictogram={createPictogram}
-            loading={loadingPictograms}
-          />
-      }
-    </>
+      </Grid>
+      <PictogramsModal
+        user={user}
+        modal={modal}
+        handleModal={handleModal}
+        pictogram={pictogram}
+        isUpdate={isUpdate}
+        setPictogram={setPictogram}
+        createPictogram={createPictogram}
+        loading={loadingPictograms}
+      />
+    </Container>
   );
-}
+};

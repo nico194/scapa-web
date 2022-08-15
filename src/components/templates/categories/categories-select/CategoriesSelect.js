@@ -1,32 +1,32 @@
-import React from 'react'
+import { Select, OutlinedInput, MenuItem } from '@mui/material';
+import { Spinner } from '../../../atoms/spinner/Spinner';
 import { useCategories } from '../../../../hooks/useCategories';
-import Select from '../../../atoms/select/Select';
-import Spinner from '../../../atoms/spinner/Spinner';
 
-export default function CategoriesSelect({user, categorySelected, selectCategory}) {
-	const { categories, loadingCat } = useCategories(user);
 
-  const categoryOptions = categories.map(categoryItem => {
-		return (
-			<option
-				key={categoryItem.id}
-				value={categoryItem.id}
-			>
-				{categoryItem.attributes.description}
-			</option>
-		)
-	})
-
+export const CategoriesSelect = ({user, categorySelected, selectCategory}) => {
+	const {categories, loadingCat} = useCategories(user);
+	
 	if(loadingCat) {
-		return <Spinner />
+		return <Spinner type='primary'/>
 	}
 
   return (
     <Select
-			label='Categoría'
-			options={categoryOptions}
+			displayEmpty
+			value={categorySelected}
 			onChange={e => selectCategory(e.target.value)}
-			value={categorySelected ? categorySelected : categories?.id}
-		/>
+			input={<OutlinedInput />}
+			sx={{ marginBottom: 4 }}
+			fullWidth
+		>
+			{categories && categories.map((category) => (
+				<MenuItem
+					key={category.id}
+					value={category.id}
+				>
+					{category.attributes.description}
+				</MenuItem>
+			))}
+		</Select>
   )
 }

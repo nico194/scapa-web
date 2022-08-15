@@ -1,16 +1,31 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './Modal.scss'
+import { Box, Container, Modal as ModalUI } from '@mui/material'
 
-export default function Modal({ children }) {
-    
-    const node = (
-        <div className='modalContainer'>
-            <div className='modalBox'>
-                { children }
-            </div>
-        </div>
-    )
-
-    return ReactDOM.createPortal(node, document.getElementById('modal-root'));
+export const Modal = ({ children, modal, handleModal }) => {
+  return (
+    <ModalUI
+      open={modal}
+      onClose={handleModal}
+    >
+      <Box
+        sx={{
+          display: 'flex',
+          margin: '0 auto',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100vh',
+        }}
+      >
+        <Container
+          maxWidth='xl'
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          { children }
+        </Container>
+      </Box>
+    </ModalUI>
+  ) 
 }

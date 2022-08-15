@@ -1,27 +1,16 @@
+import { Box, Button, TextField } from '@mui/material';
 import React from 'react';
 
-export default function SearchComponent({
+export const SearchComponent = ({
   inputPlaceholder,
   buttonText,
   onHandleChange,
   onHandleClick,
-}) {
+}) => {
   return (
-    <div className='w-100 d-flex flex-row justify-content-start mb-4 ml-4'>
-      <input
-        type='text'
-        style={{ height: 38 }}
-        className='form-control p-1 w-50'
-        placeholder={inputPlaceholder}
-        onChange={onHandleChange}
-      />
-      <button
-        onClick={onHandleClick}
-        style={{ marginLeft: '1.5rem' }}
-        className='btn btn-primary mb-4'
-      >
-        {buttonText}
-      </button>
-    </div>
+    <Box alignItems='center'>
+      <TextField size='small' variant='outlined' label={inputPlaceholder} onChange={onHandleChange} sx={{ marginRight: 4}}/>
+      <Button onClick={onHandleClick} variant='contained'>{buttonText}</Button>
+    </Box>
   );
 }

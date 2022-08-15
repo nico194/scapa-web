@@ -1,19 +1,27 @@
-import React from 'react'
+import { Button, Grid, Typography } from '@mui/material';
+import React from 'react';
 
-export default function UploadImage({ onChange, label, placeholer, type, src, alt }) {
-    return (
-        <div className='d-flex flex-column'>
-            <div className='mb-3'>
-                <label className='form-label'>{ label }</label>
-                <input type={type} 
-                    className='form-control' 
-                    onChange={ onChange } 
-                    placeholder={ placeholer }
-                    />
-            </div>
-            <div className='w-full align-self-center'>
-                <img style={{ height: 150}} src={src} alt={alt}/>
-            </div>
-        </div>
-    )
+export default function UploadImage({ handleImage, src, alt }) {
+  return (
+    <Grid container direction='column'>
+      <Grid item container justifyContent='space-between' marginBottom={4}>
+        <Typography variant='h6'>Selecciona una imagen:</Typography>
+        <Button variant='contained' component='label'>
+          Seleccionar
+          <input
+            hidden
+            accept='image/*'
+            multiple
+            type='file'
+            onChange={handleImage}
+          />
+        </Button>
+      </Grid>
+      {src !== '' && (
+        <Grid item container justifyContent='center'>
+          <img style={{ height: '150px' }} src={src} alt={alt} loading='lazy' />
+        </Grid>
+      )}
+    </Grid>
+  );
 }

@@ -1,13 +1,10 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
 import { getRoutines } from '../../redux/actions/routines';
-import Header from '../../components/organisms/header/Header';
-import RoutinesList from '../../components/templates/routines/routines-list/RoutinesList';
+import { RoutinesList } from '../../components/templates/routines/routines-list/RoutinesList';
+import { Button, Container, Grid, Typography } from '@mui/material';
 
-export default function Routines() {
-
-
+export const Routines = () => {
 	const dispatch = useDispatch();
 	const { user } = useSelector(state => state.users)
 	const { routines, loadingRoutines } = useSelector(state => state.routines)
@@ -17,19 +14,22 @@ export default function Routines() {
 	}, []);
 
 	return (
-		<>
-			<Header />
-			<div className='container'>
-				<h1 className='mb-4'>Rutinas</h1>
-				<div className='w-100 d-flex flex-row justify-content-end mb-4'>
-					<Link to='/routine' className='btn btn-primary'>Agregar Rutina</Link>
-				</div>
+		<Container maxWidth='xl'>
+			<Grid container justifyContent='space-between'>
+				<Grid item>
+      		<Typography variant='h4' marginBottom={8}>Rutinas</Typography>
+				</Grid>
+				<Grid item>
+					<Button variant='contained' href='/routine'>Agregar Rutina</Button>
+				</Grid>
+			</Grid>
+			<Grid container direction='column'>
 				<RoutinesList
 					routines={routines}
 					loading={loadingRoutines}
 					user={user}
 				/>
-			</div>
-		</>
+			</Grid>
+		</Container>
 	)
 }

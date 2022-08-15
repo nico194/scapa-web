@@ -1,17 +1,18 @@
+import { Table as TableUI, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import React from 'react';
 
-export default function Table({ thead, tbody }) {
-    const tableHead = thead.map( (head, index) => ( <th key={index} scope='col'>{ head }</th> ));
-    return (
-        <table className='table'>
-            <thead>
-                <tr>
-                    { tableHead }
-                </tr>
-            </thead>
-            <tbody>
-                { tbody }
-            </tbody>
-        </table> 
-    )
-}
+export const Table = ({ thead, tbody }) => {
+  const tableHead = thead.map((head, index) => (
+    <TableCell key={index}>
+      {head}
+    </TableCell>
+  ));
+  return (
+    <TableUI className='table'>
+      <TableHead>
+        <TableRow>{tableHead}</TableRow>
+      </TableHead>
+      <TableBody>{tbody}</TableBody>
+    </TableUI>
+  );
+};

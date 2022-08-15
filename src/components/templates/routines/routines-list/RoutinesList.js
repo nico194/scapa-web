@@ -1,16 +1,16 @@
 import React from 'react'
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import Spinner from '../../../atoms/spinner/Spinner';
-import Phrase from '../../../organisms/phrase/Phrase';
+import { Spinner } from '../../../atoms/spinner/Spinner';
+import { Phrase } from '../../../organisms/phrase/Phrase';
 import { deleteRoutine } from '../../../../redux/actions/routines';
+import { Grid, IconButton } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 
-
-export default function RoutinesList({ routines, loading, user }) {
-
+export const RoutinesList = ({ routines, loading, user }) => {
 	const dispatch = useDispatch();
-
-	const navigate = useNavigate();
+	let navigate = useNavigate();
 
 	const updateRoutine = routineForUpdate => {
 		navigate('/routine', {
@@ -20,34 +20,32 @@ export default function RoutinesList({ routines, loading, user }) {
 		})
 	}
 
+	const deleteRoutineButton = (routine) => {
+    if (window.confirm('Desea eliminar esta categoría?')) {
+      dispatch(deleteRoutine(routine, user));
+    }
+  };
+
 	const routinesList = routines.map(routine => {
 		return (
-			<div key={routine.id} className='row align-items-center mb-5'>
-				<div className='col-10'>
+			<Grid key={routine.id} item container padding={4} marginBottom={4} border={1} borderColor='Highlight' borderRadius={4}>
+				<Grid item xs={11}>
 					<Phrase phrase={routine} />
-				</div>
-				<div className='col-2'>
-					<div className='d-flex flex-row justify-content-around align-items-center'>
-						<i
-							className='bi bi-pencil-square'
-							style={{ fontSize: '1.5rem' }}
-							onClick={() => updateRoutine(routine)}
-						>
-						</i>
-						<i
-							className='bi bi-trash-fill'
-							style={{ fontSize: '1.5rem' }}
-							onClick={() => dispatch(deleteRoutine(routine, user))}
-						>
-						</i>
-					</div>
-				</div>
-			</div>
+				</Grid>
+				<Grid item xs={1} sx={{ textAlign: 'right' }}>
+					<IconButton onClick={() => updateRoutine(routine)}>
+            <EditIcon />
+          </IconButton>
+					<IconButton onClick={() => deleteRoutineButton(routine)}>
+            <DeleteIcon />
+          </IconButton>
+				</Grid>
+			</Grid>
 		);
 	})
 
 	if (loading) {
-		return <Spinner />
+		return <Spinner type='primary'/>
 	}
 
 	return (

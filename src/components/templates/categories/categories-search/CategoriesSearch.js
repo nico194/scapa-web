@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { getCategories } from '../../../../redux/actions/categories';
-import SearchComponent from '../../../organisms/search-component/SearchComponent';
+import { SearchComponent } from '../../../organisms/search-component/SearchComponent';
 
-export default function CategoriesSearch({ user }) {
+export const CategoriesSearch = ({ user }) => {
   const dispatch = useDispatch();
   const [description, setDescription] = useState()
 

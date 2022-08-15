@@ -6,15 +6,14 @@ import {
   updateCategory,
   clearError
 } from '../../redux/actions/categories';
-import Header from '../../components/organisms/header/Header';
-import CategoriesTable from '../../components/templates/categories/categories-table/CategoriesTable';
-import CategoriesSearch from '../../components/templates/categories/categories-search/CategoriesSearch';
-import Button from '../../components/atoms/button/Button';
-import CategoriesModal from '../../components/templates/categories/categories-modal/CategoriesModal';
-import Alert from '../../components/atoms/alert/Alert';
-import CategoriesPagination from '../../components/templates/categories/categories-pagination/CategoriesPagination';
+import { CategoriesTable } from '../../components/templates/categories/categories-table/CategoriesTable';
+import { CategoriesSearch } from '../../components/templates/categories/categories-search/CategoriesSearch';
+import { CategoriesModal } from '../../components/templates/categories/categories-modal/CategoriesModal';
+import { CategoriesPagination } from '../../components/templates/categories/categories-pagination/CategoriesPagination';
+import { Container, Grid, Typography, Alert, IconButton, Button } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 
-export default function Categories() {
+export const Categories = () => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.users);
   const { 
@@ -22,16 +21,15 @@ export default function Categories() {
     loadingCategories,
     err,
     changed,
-    previousPage,
-    currentPage,
     totalPage,
-    nextPage 
   } = useSelector((state) => state.categories);
 
   const initialStateCategory = {
     id: -1,
+    previewImage: null,
     attributes: {
       description: '',
+      image_url: '',
     },
   };
   const [modal, setModal] = useState(false);
@@ -62,29 +60,44 @@ export default function Categories() {
   };
 
   return (
-    <>
-      <Header />
-      <div className='container'>
-        <h1 className='mb-4'>Categorias</h1>
-        <div className='row'>
-          <div className='col-12 col-md-6'>
-            <CategoriesSearch user={user} />
-          </div>
-          <div className='col-12 col-md-6'>
-            <Button
-              text='Agregar Categoria'
-              type='primary'
-              position='center'
-              extraClassName='justify-content-md-end'
-              onClick={openModal}
-            />
-          </div>
-        </div>
-        <div className='row'>
-          <div className='col-12'>
-            { err && <Alert message={err} onClick={() => dispatch(clearError())} /> }
-          </div>
-        </div>
+    <Container maxWidth='xl'>
+      <Typography variant='h4' marginBottom={8}>Categorias</Typography>
+      {
+        err &&
+          <Grid container marginBottom={4}>
+            <Alert 
+              severity='error' 
+              sx={{
+                width: '100%',
+                borderRadius: 2,
+                padding: 1,
+                paddingX: 4,
+                fontSize: 18,
+                alignItems: 'center'
+              }}
+              action={
+                <IconButton
+                  color='inherit'
+                  size='large'
+                  onClick={() => dispatch(clearError())}
+                >
+                  <CloseIcon fontSize='inherit' />
+                </IconButton>
+              }
+            >
+              {err}
+            </Alert>
+          </Grid>
+      }
+      <Grid container justifyContent='space-between' marginBottom={6}>
+        <Grid item>
+          <CategoriesSearch user={user} />
+        </Grid>
+        <Grid item>
+          <Button onClick={openModal} variant='contained'>Agregar Categoria</Button>
+        </Grid>
+      </Grid>
+      <Grid container marginBottom={4}>
         <CategoriesTable 
           categories={categories} 
           user={user}
@@ -92,24 +105,23 @@ export default function Categories() {
           setCategory={setCategory}
           setModal={setModal}
           setIsUpdate={setIsUpdate}
-        />
+          />
+      </Grid>
+      <Grid container justifyContent='center'>
         <CategoriesPagination
           user={user}
-          currentPage={currentPage}
           totalPage={totalPage}
         />
-        {
-          modal &&
-          <CategoriesModal 
-            category={category}
-            isUpdate={isUpdate}
-            setCategory={setCategory}
-            setModal={setModal}
-            createCategory={createCategory}
-            loading={loadingCategories}
-          />
-        }
-      </div>
-    </>
+      </Grid>
+      <CategoriesModal 
+        modal={modal}
+        handleModal={setModal}
+        category={category}
+        isUpdate={isUpdate}
+        setCategory={setCategory}
+        createCategory={createCategory}
+        loading={loadingCategories}
+      />
+    </Container>
   );
 }

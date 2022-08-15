@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { getPictograms } from '../../../../redux/actions/pictograms';
-import SearchComponent from '../../../organisms/search-component/SearchComponent';
+import { SearchComponent } from '../../../organisms/search-component/SearchComponent';
 
-export default function PictogramsSearch({ user }) {
+export const PictogramsSearch = ({ user }) => {
   const dispatch = useDispatch();
   const [description, setDescription] = useState()
 
