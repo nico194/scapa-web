@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { signIn } from '../../redux/actions/users';
+import { signIn, clearError } from '../../redux/actions/users';
+import { Spinner } from '../../components/atoms/spinner/Spinner'
 import { Card } from '../../components/molecules/card/Card';
-import { Container, Box, TextField, Typography, Button } from '@mui/material';
+import { Container, Box, TextField, Typography, Button, Grid, Alert, IconButton } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 
 export const Login = () => {
   let navigate = useNavigate();
@@ -24,6 +26,7 @@ export const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if(email === '' || password === '') return setShowAlert(true);
     setShowAlert(false);
     dispatch(signIn({ email, password }));
   };
@@ -64,6 +67,32 @@ export const Login = () => {
                 Sistema de Comunicacion Aumentativo y Alternativo para Personas
                 con Autismo
               </Typography>
+              {(err || showAlert) && (
+                <Grid container marginBottom={4}>
+                  <Alert
+                    severity='error'
+                    sx={{
+                      width: '100%',
+                      borderRadius: 2,
+                      padding: 1,
+                      paddingX: 4,
+                      fontSize: 18,
+                      alignItems: 'center',
+                    }}
+                    action={
+                      <IconButton
+                        color='inherit'
+                        size='large'
+                        onClick={() => err ? dispatch(clearError()) : setShowAlert(false)}
+                      >
+                        <CloseIcon fontSize='inherit' />
+                      </IconButton>
+                    }
+                  >
+                    {err ? err : 'Complete todos los datos del formulario'}
+                  </Alert>
+                </Grid>
+              )}
               <Box paddingX={5}>
                 <TextField
                   fullWidth
@@ -86,13 +115,15 @@ export const Login = () => {
           }
           actions={
             <Box paddingX={2} width='100%'>
-              <Button fullWidth variant='contained' onClick={handleSubmit}>Ingresar</Button>
+              <Button fullWidth variant='contained' sx={{ textAlign: 'center' }}onClick={handleSubmit}>
+                { loading ? <Spinner type='light'/> : 'Ingresar'}
+              </Button>
             </Box>
           }
         />
       </Container>
     </Box>
   );
-}
+};
 
 export default Login;

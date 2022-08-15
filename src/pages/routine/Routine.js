@@ -10,7 +10,6 @@ import {
 import { CategoriesSelect } from '../../components/templates/categories/categories-select/CategoriesSelect';
 import { PictogramsContainer } from '../../components/templates/pictograms/pictograms-container/PictogramsContainer';
 import { Phrase } from '../../components/organisms/phrase/Phrase';
-import { Spinner } from '../../components/atoms/spinner/Spinner';
 import {
   Alert,
   Button,
@@ -46,9 +45,9 @@ export const Routine = () => {
   let navigate = useNavigate();
   const location = useLocation();
   const routineForUpdate = location.state
-	? location.state.routineForUpdate
-	: null;
-	
+    ? location.state.routineForUpdate
+    : null;
+
   useEffect(() => {
     if (routineForUpdate) {
       setIsUpdate(true);
@@ -117,7 +116,7 @@ export const Routine = () => {
             sx={{ marginLeft: 4 }}
             onClick={addOrEditRoutine}
           >
-            { isUpdate ? 'Actualizar ' :  'Agregar '}Rutina
+            {isUpdate ? 'Actualizar ' : 'Agregar '}Rutina
           </Button>
         </Grid>
       </Grid>
@@ -137,7 +136,9 @@ export const Routine = () => {
               <IconButton
                 color='inherit'
                 size='large'
-                onClick={() => err ? dispatch(clearError()) : setShowAlert(false)}
+                onClick={() =>
+                  err ? dispatch(clearError()) : setShowAlert(false)
+                }
               >
                 <CloseIcon fontSize='inherit' />
               </IconButton>
@@ -159,7 +160,9 @@ export const Routine = () => {
       </Grid>
       <Grid container marginBottom={6} spacing={4}>
         <Grid item borderRight={1} borderColor='grey.300' xs={6}>
-          <Typography variant='h5' marginBottom={4}>Rutina</Typography>
+          <Typography variant='h5' marginBottom={4}>
+            Rutina
+          </Typography>
           <Phrase
             phrase={routine}
             from='routine'
